@@ -2,7 +2,7 @@
 devid=eejitgames
 devtitle=eejit
 gameid=20sec-jam-2023
-gametitle=20 Second Jam 2023
+gametitle=Fishing with Anchors !
 version=0.1
 icon=metadata/icon.png
 
