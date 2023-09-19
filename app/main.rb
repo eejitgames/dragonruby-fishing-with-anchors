@@ -43,8 +43,8 @@ end
 def tick_game_scene
   @args_outputs.background_color = [0, 0, 0]
   
-  show_framerate
   render_background
+  show_framerate
 
   if @args_inputs.mouse.click
     @args_state.next_scene = :game_over_scene
