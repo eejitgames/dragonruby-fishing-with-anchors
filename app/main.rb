@@ -66,6 +66,16 @@ def render_background
   waves << scrolling_background(@scroll_point_at, 'sprites/water4.png', 0.5 , 182)
   waves << scrolling_background(@scroll_point_at, 'sprites/water3.png', 1.0 , 122)
   waves << scrolling_background(@scroll_point_at, 'sprites/water2.png', 2.0 , 60)
+  # hax stick ship in here for now to get it in at the correct layer
+  waves << {
+           x:                   400,
+           y:                   350,
+           w:                   458,
+           h:                   322,
+           path: "sprites/ship.png",
+           angle:                 0,
+           a:                   255
+           }
   waves << scrolling_background(@scroll_point_at, 'sprites/water1.png', 4.0 , 0)
   @args_outputs.sprites << waves
 end
