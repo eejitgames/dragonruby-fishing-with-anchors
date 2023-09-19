@@ -1,8 +1,11 @@
 def tick args
+  # using sample 02_input_basics/07_managing_scenes as an initial sort of starting point/template
+  # setup some handy ivars
   @args_state   = args.state
   @args_inputs  = args.inputs
   @args_outputs = args.outputs
   @args_gtk     = args.gtk
+
   current_scene = @args_state.current_scene
 
   case current_scene
@@ -23,8 +26,8 @@ def tick args
 end
 
 def defaults
-  @my_tick_count = 0
-  @scroll_point_at = 0
+  @my_tick_count = 0   # sort of shadowing the tick count, may prove useful
+  @scroll_point_at = 0 # used for positioning sections of the scrolling background
   @args_state.defaults_set = true
 end
 
@@ -52,7 +55,7 @@ def tick_game_scene
 end
 
 def render_background
-  # inspiration from flappy dragon
+  # parallax inspiration from 99_genre_arcade/flappy_dragon sample
   # scroll_point_at   = state.scene_at if state.scene == :menu
   # scroll_point_at   = state.death_at if state.countdown > 0
   @scroll_point_at = @my_tick_count
