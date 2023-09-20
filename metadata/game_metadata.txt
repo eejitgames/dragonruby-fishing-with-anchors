@@ -1,7 +1,7 @@
 # Remove the pound sign and leading space for the properties below before publishing your game.
 devid=eejitgames
 devtitle=eejit
-gameid=20sec-jam-2023
+gameid=fishing-with-anchors
 gametitle=Fishing with Anchors !
 version=0.1
 icon=metadata/icon.png
