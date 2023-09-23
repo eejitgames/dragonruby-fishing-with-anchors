@@ -68,7 +68,7 @@ def render_background
   waves << scrolling_background(@scroll_point_at, 'sprites/water2.png', 2.0 , 60)
   # hax stick ship in here for now to get it in at the correct layer
   waves << {
-           x:                   400,
+           x:                   394,
            y:                   350,
            w:                   458,
            h:                   322,
