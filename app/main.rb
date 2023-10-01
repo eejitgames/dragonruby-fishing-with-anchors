@@ -1,6 +1,5 @@
 def tick args
   # using sample 02_input_basics/07_managing_scenes as an initial sort of starting point/template
-  # setup some handy ivars
   @args_state   = args.state
   @args_inputs  = args.inputs
   @args_outputs = args.outputs
@@ -27,9 +26,9 @@ end
 
 def tick_title_scene
   @args_outputs.labels << { x: 640,
-                    y: 360,
-                    text: "Title Scene (click to go to game)",
-                    alignment_enum: 1 }
+                            y: 360,
+                            text: "Title Scene (click to go to game)",
+                            alignment_enum: 1 }
 
   if @args_inputs.mouse.click
     @args_state.next_scene = :game_scene
@@ -37,10 +36,24 @@ def tick_title_scene
   end
 end
 
+def tick_game_over_scene
+  @args_outputs.labels << { x: 640,
+                            y: 360,
+                            text: "Game Over Scene (click to go to title)",
+                            alignment_enum: 1 }
+
+  if @args_inputs.mouse.click
+    @args_state.next_scene = :title_scene
+    @args_state.defaults_set = nil
+  end
+end
+
 def tick_game_scene
   @args_outputs.background_color = [0, 0, 0]
   
-  render_background
+  render_background_waves
+  render_pirate_ship_fg_wave
+  render_anchors
   show_framerate
 
   if @args_inputs.mouse.click
@@ -48,40 +61,67 @@ def tick_game_scene
   end
 end
 
-def render_background
+def render_background_waves
   # parallax inspiration from 99_genre_arcade/flappy_dragon sample
   # scroll_point_at   = state.scene_at if state.scene == :menu
   # scroll_point_at   = state.death_at if state.countdown > 0
   @scroll_point_at = @my_tick_count
   @my_tick_count += 1
+  @waves = []
+  @x_coor = x_coor(@scroll_point_at, 0.25)
+  @waves << scrolling_background(@x_coor, 'sprites/water5.png', 240)
+  @x_coor = x_coor(@scroll_point_at, 0.5)
+  @waves << scrolling_background(@x_coor, 'sprites/water4.png', 182)
+  @x_coor = x_coor(@scroll_point_at, 1.0)
+  @waves << scrolling_background(@x_coor, 'sprites/water3.png', 122)
+  @x_coor = x_coor(@scroll_point_at, 2.0)
+  @waves << scrolling_background(@x_coor, 'sprites/water2.png', 60)
+  @x_coor = x_coor(@scroll_point_at, 4.0)
+end
 
-  waves = []
-  waves << scrolling_background(@scroll_point_at, 'sprites/water5.png', 0.25, 240)
-  waves << scrolling_background(@scroll_point_at, 'sprites/water4.png', 0.5 , 182)
-  waves << scrolling_background(@scroll_point_at, 'sprites/water3.png', 1.0 , 122)
-  waves << scrolling_background(@scroll_point_at, 'sprites/water2.png', 2.0 , 60)
-  # hax stick ship in here for now to get it in at the correct layer
-  waves << {
-           x:                   420,
-           y:                   708 - @position[x_coor(@scroll_point_at, 4.0)][:y],
-           w:                   458,
-           h:                   322,
-           path: "sprites/ship.png",
-           angle: ((@position[x_coor(@scroll_point_at, 4.0)][:angle])),
-           a:                   255
-           }
-  waves << scrolling_background(@scroll_point_at, 'sprites/water1.png', 4.0 , 0)
-  @args_outputs.sprites << waves
+def render_pirate_ship_fg_wave
+  @waves << { x:                   420,
+              y:                   708 - @position[@x_coor][:y],
+              w:                   458,
+              h:                   322,
+              path: "sprites/ship.png",
+              angle: ((@position[@x_coor][:angle])),
+              a:                   255 }
+  @waves << scrolling_background(@x_coor, 'sprites/water1.png', 0)
+end
+
+def render_anchors
+  shangle = @position[@x_coor][:angle] * @convert
+  shipy = @position[@x_coor][:y]
+  @waves << { x: (419 + (458/2)) - (@radius1 * Math.sin(@dangle1 - shangle)) - 34.5,
+              y: (869 - shipy) - (@radius1 * Math.cos(@dangle1 - shangle)) - 68,
+              w: 70,
+              h: 70,
+              path: "sprites/anchor.png",
+              angle: 0 }
+  @waves << { x: (419 + (458/2)) - (@radius2 * Math.sin(@dangle2 - shangle)) - 34.5,
+              y: (869 - shipy) - (@radius2 * Math.cos(@dangle2 - shangle)) - 68,
+              w: 70,
+              h: 70,
+              path: "sprites/anchor.png",
+              angle: 0 }
+  @waves << { x: (419 + (458/2)) + (@radius3 * Math.cos(@dangle3 - shangle)) - 34.5,
+              y: (869 - shipy) - (@radius3 * Math.sin(@dangle3 - shangle)) - 68,
+              w: 70,
+              h: 70,
+              path: "sprites/anchor.png",
+              angle: 0 }
+  @args_outputs.sprites << @waves
 end
 
 def x_coor at, rate
   (1280 - at.*(rate) % 1280).to_i
 end
 
-def scrolling_background at, path, rate, y = 0
+def scrolling_background x, path, y = 0
   [
-    { x:    0 - at.*(rate) % 1280, y: y, w: 1280, h: 720, path: path },
-    { x: 1280 - at.*(rate) % 1280, y: y, w: 1280, h: 720, path: path }
+    { x: x - 1280, y: y, w: 1280, h: 720, path: path },
+    { x: x, y: y, w: 1280, h: 720, path: path }
   ]
 end
 
@@ -93,21 +133,17 @@ def show_framerate
   @args_outputs.primitives << @args_gtk.current_framerate_primitives if @show_fps
 end
 
-def tick_game_over_scene
-  @args_outputs.labels << { x: 640,
-                    y: 360,
-                    text: "Game Over Scene (click to go to title)",
-                    alignment_enum: 1 }
-
-  if @args_inputs.mouse.click
-    @args_state.next_scene = :title_scene
-    @args_state.defaults_set = nil
-  end
-end
-
 def defaults
   @my_tick_count = 0   # sort of shadowing the tick count, may prove useful
   @scroll_point_at = 0 # used for positioning sections of the scrolling background
+  @radius1 = 164.2680736
+  @radius2 = 111.3058848
+  @radius3 = 140.8687332
+  #@dangle2 = 8.785298718 # radians vs degrees
+  @dangle1 = 0.8370762479
+  @dangle2 = 0.1533323884
+  @dangle3 = 0.8960553846
+  @convert = Math::PI / 180
   @args_state.defaults_set = true
   @position = {        # used to follow the front most wave
     0 => { y: 384.0, angle: 0.0 },
