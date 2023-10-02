@@ -37,10 +37,10 @@ def tick_title_scene
 end
 
 def tick_game_over_scene
-  @args_outputs.labels << { x: 640,
-                            y: 360,
-                            text: "Game Over Scene (click to go to title)",
-                            alignment_enum: 1 }
+
+  render_background_waves
+  render_pirate_ship_fg_wave
+  render_anchors
 
   if @args_inputs.mouse.click
     @args_state.next_scene = :title_scene
@@ -51,6 +51,7 @@ end
 def tick_game_scene
   @args_outputs.background_color = [0, 0, 0]
   
+  bump_timer
   render_background_waves
   render_pirate_ship_fg_wave
   render_anchors
@@ -61,12 +62,15 @@ def tick_game_scene
   end
 end
 
+def bump_timer
+  @scroll_point_at = @my_tick_count
+  @my_tick_count += 1
+end
+
 def render_background_waves
   # parallax inspiration from 99_genre_arcade/flappy_dragon sample
   # scroll_point_at   = state.scene_at if state.scene == :menu
   # scroll_point_at   = state.death_at if state.countdown > 0
-  @scroll_point_at = @my_tick_count
-  @my_tick_count += 1
   @waves = []
   @x_coor = x_coor(@scroll_point_at, @wave_speed)
   @waves << scrolling_background(@x_coor, 'sprites/water5.png', 240)
