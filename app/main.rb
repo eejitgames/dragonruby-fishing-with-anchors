@@ -68,15 +68,15 @@ def render_background_waves
   @scroll_point_at = @my_tick_count
   @my_tick_count += 1
   @waves = []
-  @x_coor = x_coor(@scroll_point_at, 0.25)
+  @x_coor = x_coor(@scroll_point_at, @wave_speed)
   @waves << scrolling_background(@x_coor, 'sprites/water5.png', 240)
-  @x_coor = x_coor(@scroll_point_at, 0.5)
+  @x_coor = x_coor(@scroll_point_at, @wave_speed * 2)
   @waves << scrolling_background(@x_coor, 'sprites/water4.png', 182)
-  @x_coor = x_coor(@scroll_point_at, 1.0)
+  @x_coor = x_coor(@scroll_point_at, @wave_speed * 4)
   @waves << scrolling_background(@x_coor, 'sprites/water3.png', 122)
-  @x_coor = x_coor(@scroll_point_at, 2.0)
+  @x_coor = x_coor(@scroll_point_at, @wave_speed * 8)
   @waves << scrolling_background(@x_coor, 'sprites/water2.png', 60)
-  @x_coor = x_coor(@scroll_point_at, 4.0)
+  @x_coor = x_coor(@scroll_point_at, @wave_speed * 16)
 end
 
 def render_pirate_ship_fg_wave
@@ -136,6 +136,7 @@ end
 def defaults
   @my_tick_count = 0   # sort of shadowing the tick count, may prove useful
   @scroll_point_at = 0 # used for positioning sections of the scrolling background
+  @wave_speed = 0.2
   @radius1 = 164.2680736
   @radius2 = 111.3058848
   @radius3 = 140.8687332
