@@ -37,7 +37,6 @@ def tick_title_scene
 end
 
 def tick_game_over_scene
-
   render_background_waves
   render_pirate_ship_fg_wave
   render_anchors
@@ -49,8 +48,6 @@ def tick_game_over_scene
 end
 
 def tick_game_scene
-  @args_outputs.background_color = [0, 0, 0]
-  
   bump_timer
   render_background_waves
   render_pirate_ship_fg_wave
@@ -68,9 +65,8 @@ def bump_timer
 end
 
 def render_background_waves
+  @args_outputs.background_color = [0, 0, 0]
   # parallax inspiration from 99_genre_arcade/flappy_dragon sample
-  # scroll_point_at   = state.scene_at if state.scene == :menu
-  # scroll_point_at   = state.death_at if state.countdown > 0
   @waves = []
   @x_coor = x_coor(@scroll_point_at, @wave_speed)
   @waves << scrolling_background(@x_coor, 'sprites/water5.png', 240)
@@ -97,19 +93,19 @@ end
 def render_anchors
   shangle = @position[@x_coor][:angle] * @convert
   shipy = @position[@x_coor][:y]
-  @waves << { x: (419 + (458/2)) - (@radius1 * Math.sin(@dangle1 - shangle)) - 34.5,
+  @waves << { x: 648 - (@radius1 * Math.sin(@dangle1 - shangle)) - 34.5,
               y: (869 - shipy) - (@radius1 * Math.cos(@dangle1 - shangle)) - 68,
               w: 70,
               h: 70,
               path: "sprites/anchor.png",
               angle: 0 }
-  @waves << { x: (419 + (458/2)) - (@radius2 * Math.sin(@dangle2 - shangle)) - 34.5,
+  @waves << { x: 648 - (@radius2 * Math.sin(@dangle2 - shangle)) - 34.5,
               y: (869 - shipy) - (@radius2 * Math.cos(@dangle2 - shangle)) - 68,
               w: 70,
               h: 70,
               path: "sprites/anchor.png",
               angle: 0 }
-  @waves << { x: (419 + (458/2)) + (@radius3 * Math.cos(@dangle3 - shangle)) - 34.5,
+  @waves << { x: 648 + (@radius3 * Math.cos(@dangle3 - shangle)) - 34.5,
               y: (869 - shipy) - (@radius3 * Math.sin(@dangle3 - shangle)) - 68,
               w: 70,
               h: 70,
@@ -144,7 +140,6 @@ def defaults
   @radius1 = 164.2680736
   @radius2 = 111.3058848
   @radius3 = 140.8687332
-  #@dangle2 = 8.785298718 # radians vs degrees
   @dangle1 = 0.8370762479
   @dangle2 = 0.1533323884
   @dangle3 = 0.8960553846
