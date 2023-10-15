@@ -80,33 +80,40 @@ def render_background_waves
 end
 
 def render_pirate_ship_fg_wave
-  @waves << { x:                   420,
-              y:                   708 - @position[@x_coor][:y],
-              w:                   458,
-              h:                   322,
+  # hax stick ship in here for now to get it in at the correct layer
+  @waves << { x: 420,
+              y: 708 - @position[@x_coor][:y],
+              w: 458,
+              h: 322,
               path: "sprites/ship.png",
               angle: ((@position[@x_coor][:angle])),
-              a:                   255 }
-  @waves << scrolling_background(@x_coor, 'sprites/water1.png', 0)
+              a: 255 }
+  @waves << scrolling_background(@x_coor, 'sprites/water1.png')
 end
 
 def render_anchors
   shangle = @position[@x_coor][:angle] * @convert
   shipy = @position[@x_coor][:y]
-  @waves << { x: 648 - (@radius1 * Math.sin(@dangle1 - shangle)) - 34.5,
-              y: (869 - shipy) - (@radius1 * Math.cos(@dangle1 - shangle)) - 68,
+  @anchors.left.ship_x = 613.5 - (@radius1 * Math.sin(@dangle1 - shangle))
+  @anchors.left.ship_y = (801 - shipy) - (@radius1 * Math.cos(@dangle1 - shangle))
+  @anchors.middle.ship_x = 613.5 - (@radius2 * Math.sin(@dangle2 - shangle))
+  @anchors.middle.ship_y = (801 - shipy) - (@radius2 * Math.cos(@dangle2 - shangle))
+  @anchors.right.ship_x = 613.5 + (@radius3 * Math.cos(@dangle3 - shangle))
+  @anchors.right.ship_y = (801 - shipy) - (@radius3 * Math.sin(@dangle3 - shangle))
+  @waves << { x: @anchors.left.ship_x,
+              y: @anchors.left.ship_y,
               w: 70,
               h: 70,
               path: "sprites/anchor.png",
               angle: 0 }
-  @waves << { x: 648 - (@radius2 * Math.sin(@dangle2 - shangle)) - 34.5,
-              y: (869 - shipy) - (@radius2 * Math.cos(@dangle2 - shangle)) - 68,
+  @waves << { x: @anchors.middle.ship_x,
+              y: @anchors.middle.ship_y,
               w: 70,
               h: 70,
               path: "sprites/anchor.png",
               angle: 0 }
-  @waves << { x: 648 + (@radius3 * Math.cos(@dangle3 - shangle)) - 34.5,
-              y: (869 - shipy) - (@radius3 * Math.sin(@dangle3 - shangle)) - 68,
+  @waves << { x: @anchors.right.ship_x,
+              y: @anchors.right.ship_y,
               w: 70,
               h: 70,
               path: "sprites/anchor.png",
@@ -137,6 +144,7 @@ def defaults
   @my_tick_count = 0   # sort of shadowing the tick count, may prove useful
   @scroll_point_at = 0 # used for positioning sections of the scrolling background
   @wave_speed = 0.2
+  # some magic numbers worked out based on the ship sprite
   @radius1 = 164.2680736
   @radius2 = 111.3058848
   @radius3 = 140.8687332
@@ -144,8 +152,25 @@ def defaults
   @dangle2 = 0.1533323884
   @dangle3 = 0.8960553846
   @convert = Math::PI / 180
+  @anchors = {
+    left: {
+      state: :idle,
+      ship_x: 0,
+      ship_y: 0
+    },
+    middle: {
+      state: :idle,
+      ship_x: 0,
+      ship_y: 0
+    },
+    right: {
+      state: :idle,
+      ship_x: 0,
+      ship_y: 0
+    }
+  }
   @args_state.defaults_set = true
-  @position = {        # used to follow the front most wave
+  @position = { # used to follow the front most wave
     0 => { y: 384.0, angle: 0.0 },
     1 => { y: 383.9997108520141, angle: -0.028903126681082850 },
     2 => { y: 383.9988434150238, angle: -0.057805537606334200 },
