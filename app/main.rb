@@ -74,15 +74,17 @@ def check_anchor_input
       puts "mouse x: #{mouse_x}"
       puts "mouse y: #{mouse_y}"
       idle_anchors = @anchors.select { |_, anchor| anchor[:state] == :idle }
-      puts "idle anchors: #{idle_anchors}"
-      puts "checking which is closest"
-      distances = idle_anchors.map do |id, obj|
-        distance = Math.sqrt((mouse_x - obj[:ship_x])**2 + (mouse_y - obj[:ship_y])**2 )
-        { id: id, distance: distance }
+      unless idle_anchors.empty?
+        puts "idle anchors: #{idle_anchors}"
+        puts "checking which is closest"
+        distances = idle_anchors.map do |id, obj|
+          distance = Math.sqrt((mouse_x - obj[:ship_x])**2 + (mouse_y - obj[:ship_y])**2 )
+          { id: id, distance: distance }
+        end
+        puts "the distances are: #{distances}"
+        closest = distances.min_by { |item| item[:distance] }
+        puts "closest: #{closest}"
       end
-      puts "the distances are: #{distances}"
-      closest = distances.min_by { |item| item[:distance] }
-      puts "closest: #{closest}"
     end
   end
 end
