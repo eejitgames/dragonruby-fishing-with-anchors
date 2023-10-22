@@ -70,21 +70,16 @@ def check_anchor_input
   if @args_inputs.mouse.click
     mouse_x = @args_inputs.mouse.click.point.x
     mouse_y = @args_inputs.mouse.click.point.y
-    unless mouse_y > 340 # check in the main body of the front most wave
-      puts "mouse x: #{mouse_x}"
-      puts "mouse y: #{mouse_y}"
+    unless mouse_y > 340 # check in the main body of the front most wave, subject to change
       idle_anchors = @anchors.select { |_, anchor| anchor[:state] == :idle }
       unless idle_anchors.empty?
-        puts "idle anchors: #{idle_anchors}"
-        puts "checking which is closest"
         distances = idle_anchors.map do |id, obj|
           # distance = Math.sqrt((mouse_x - obj[:ship_x])**2 + (mouse_y - obj[:ship_y])**2 )
           distance = (mouse_x - obj[:ship_x])**2 + (mouse_y - obj[:ship_y])**2
           { id: id, distance: distance }
         end
-        puts "the distances are: #{distances}"
         closest = distances.min_by { |item| item[:distance] }
-        puts "closest: #{closest}"
+        @anchors[closest.id].state = :outward
       end
     end
   end
