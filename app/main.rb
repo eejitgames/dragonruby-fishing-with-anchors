@@ -78,7 +78,8 @@ def check_anchor_input
         puts "idle anchors: #{idle_anchors}"
         puts "checking which is closest"
         distances = idle_anchors.map do |id, obj|
-          distance = Math.sqrt((mouse_x - obj[:ship_x])**2 + (mouse_y - obj[:ship_y])**2 )
+          # distance = Math.sqrt((mouse_x - obj[:ship_x])**2 + (mouse_y - obj[:ship_y])**2 )
+          distance = (mouse_x - obj[:ship_x])**2 + (mouse_y - obj[:ship_y])**2
           { id: id, distance: distance }
         end
         puts "the distances are: #{distances}"
