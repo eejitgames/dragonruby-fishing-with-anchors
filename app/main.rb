@@ -52,6 +52,7 @@ def tick_game_scene
   render_background_waves
   render_pirate_ship_fg_wave
   render_anchors
+  check_anchor_input
   show_framerate
 
   if @args_inputs.mouse.click
@@ -62,6 +63,28 @@ end
 def bump_timer
   @scroll_point_at = @my_tick_count
   @my_tick_count += 1
+end
+
+def check_anchor_input
+  # if there is player input, then check for nearest available anchor
+  if @args_inputs.mouse.click
+    mouse_x = @args_inputs.mouse.click.point.x
+    mouse_y = @args_inputs.mouse.click.point.y
+    unless mouse_y > 340 # check in the main body of the front most wave
+      puts "mouse x: #{mouse_x}"
+      puts "mouse y: #{mouse_y}"
+      idle_anchors = @anchors.select { |_, anchor| anchor[:state] == :idle }
+      puts "idle anchors: #{idle_anchors}"
+      puts "checking which is closest"
+      distances = idle_anchors.map do |id, obj|
+        distance = Math.sqrt((mouse_x - obj[:ship_x])**2 + (mouse_y - obj[:ship_y])**2 )
+        { id: id, distance: distance }
+      end
+      puts "the distances are: #{distances}"
+      closest = distances.min_by { |item| item[:distance] }
+      puts "closest: #{closest}"
+    end
+  end
 end
 
 def render_background_waves
@@ -133,9 +156,9 @@ def scrolling_background x, path, y = 0
 end
 
 def show_framerate
-  # @variable s are called instance variables in ruby.
+  # @variables are called instance variables in ruby.
   # Which means you can access these variables in ANY METHOD inside the class.
-  # [ Across all methods in the class]
+  # (Across all methods in the class - in this case, the top most class)
   @show_fps = !@show_fps if @args_inputs.keyboard.key_down.forward_slash
   @args_outputs.primitives << @args_gtk.current_framerate_primitives if @show_fps
 end
@@ -156,17 +179,29 @@ def defaults
     left: {
       state: :idle,
       ship_x: 0,
-      ship_y: 0
+      ship_y: 0,
+      anchor_x: 0,
+      anchor_y: 0,
+      target_x: 0,
+      target_y: 0
     },
     middle: {
       state: :idle,
       ship_x: 0,
-      ship_y: 0
+      ship_y: 0,
+      anchor_x: 0,
+      anchor_y: 0,
+      target_x: 0,
+      target_y: 0
     },
     right: {
       state: :idle,
       ship_x: 0,
-      ship_y: 0
+      ship_y: 0,
+      anchor_x: 0,
+      anchor_y: 0,
+      target_x: 0,
+      target_y: 0
     }
   }
   @args_state.defaults_set = true
