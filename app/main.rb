@@ -56,7 +56,8 @@ def tick_game_scene
   show_framerate
 
   if @args_inputs.mouse.click
-    @args_state.next_scene = :game_over_scene
+    # for now, the top part of the screen ends the game scene
+    @args_state.next_scene = :game_over_scene if @args_inputs.mouse.click.point.y > 400
   end
 end
 
