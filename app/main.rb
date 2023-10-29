@@ -53,6 +53,10 @@ def tick_game_scene
   render_pirate_ship_fg_wave
   render_anchors
   check_anchor_input
+  move_anchors_chains_outward
+  check_anchors_endpoint
+  move_anchors_chains_inward
+  draw_anchors_chains
   show_framerate
 
   if @args_inputs.mouse.click
@@ -84,6 +88,30 @@ def check_anchor_input
       end
     end
   end
+end
+
+def move_anchors_chains_outward
+  outward_anchors = @anchors.select { |_, anchor| anchor[:state] == :outward }
+  unless outward_anchors.empty?
+    puts60 "there are some outward moving anchors"
+  end
+end
+
+def check_anchors_endpoint
+  endpoint_anchors = @anchors.select { |_, anchor| anchor[:state] == :endpoint }
+  unless endpoint_anchors.empty?
+    puts60 "some anchors are at the outermost endpoint"
+  end
+end
+
+def move_anchors_chains_inward
+  inward_anchors = @anchors.select { |_, anchor| anchor[:state] == :inward }
+  unless inward_anchors.empty?
+    puts60 "there are some inward moving anchors"
+  end
+end
+
+def draw_anchors_chains
 end
 
 def render_background_waves
@@ -159,7 +187,7 @@ def show_framerate
   # Which means you can access these variables in ANY METHOD inside the class.
   # (Across all methods in the class - in this case, the top most class)
   @show_fps = !@show_fps if @args_inputs.keyboard.key_down.forward_slash
-  @args_outputs.primitives << @args_gtk.current_framerate_primitives if @show_fps
+  @args_outputs.primitives << @args_gtk.framerate_diagnostics_primitives if @show_fps
 end
 
 def defaults
