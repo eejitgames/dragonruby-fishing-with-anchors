@@ -1,3 +1,5 @@
+$gtk.set_window_scale(0.75)
+
 def tick args
   # using sample 02_input_basics/07_managing_scenes as an initial sort of starting point/template
   @args_state   = args.state
