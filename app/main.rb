@@ -41,7 +41,7 @@ end
 def tick_game_over_scene
   render_background_waves
   render_pirate_ship_fg_wave
-  render_anchors
+  draw_anchors_and_chains
 
   if @args_inputs.mouse.click
     @args_state.next_scene = :title_scene
@@ -53,12 +53,11 @@ def tick_game_scene
   bump_timer
   render_background_waves
   render_pirate_ship_fg_wave
-  render_anchors
   check_anchor_input
-  move_anchors_chains_outward
+  move_anchors_and_chains_outward
   check_anchors_endpoint
-  move_anchors_chains_inward
-  draw_anchors_chains
+  move_anchors_and_chains_inward
+  draw_anchors_and_chains
   show_framerate
 
   if @args_inputs.mouse.click
@@ -92,7 +91,7 @@ def check_anchor_input
   end
 end
 
-def move_anchors_chains_outward
+def move_anchors_and_chains_outward
   outward_anchors = @anchors.select { |_, anchor| anchor[:state] == :outward }
   unless outward_anchors.empty?
     puts60 "there are some outward moving anchors"
@@ -106,14 +105,11 @@ def check_anchors_endpoint
   end
 end
 
-def move_anchors_chains_inward
+def move_anchors_and_chains_inward
   inward_anchors = @anchors.select { |_, anchor| anchor[:state] == :inward }
   unless inward_anchors.empty?
     puts60 "there are some inward moving anchors"
   end
-end
-
-def draw_anchors_chains
 end
 
 def render_background_waves
@@ -143,33 +139,45 @@ def render_pirate_ship_fg_wave
   @waves << scrolling_background(@x_coor, 'sprites/water1.png')
 end
 
-def render_anchors
-  shangle = @position[@x_coor][:angle] * @convert
-  shipy = @position[@x_coor][:y]
-  @anchors.left.ship_x = 613.5 - (@radius1 * Math.sin(@dangle1 - shangle))
-  @anchors.left.ship_y = (801 - shipy) - (@radius1 * Math.cos(@dangle1 - shangle))
-  @anchors.middle.ship_x = 613.5 - (@radius2 * Math.sin(@dangle2 - shangle))
-  @anchors.middle.ship_y = (801 - shipy) - (@radius2 * Math.cos(@dangle2 - shangle))
-  @anchors.right.ship_x = 613.5 + (@radius3 * Math.cos(@dangle3 - shangle))
-  @anchors.right.ship_y = (801 - shipy) - (@radius3 * Math.sin(@dangle3 - shangle))
-  @waves << { x: @anchors.left.ship_x,
+def draw_anchors_and_chains
+  idle_anchors = @anchors.select { |_, anchor| anchor[:state] == :idle }
+  unless idle_anchors.empty?
+    shangle = @position[@x_coor][:angle] * @convert
+    shipy = @position[@x_coor][:y]
+    anchors = idle_anchors.map do |id, obj|
+      if id == :left and obj[:state] = :idle
+        @anchors.left.ship_x = 613.5 - (@radius1 * Math.sin(@dangle1 - shangle))
+        @anchors.left.ship_y = (801 - shipy) - (@radius1 * Math.cos(@dangle1 - shangle))
+        @waves << { x: @anchors.left.ship_x,
               y: @anchors.left.ship_y,
               w: 70,
               h: 70,
               path: "sprites/anchor.png",
               angle: 0 }
-  @waves << { x: @anchors.middle.ship_x,
-              y: @anchors.middle.ship_y,
-              w: 70,
-              h: 70,
-              path: "sprites/anchor.png",
-              angle: 0 }
-  @waves << { x: @anchors.right.ship_x,
-              y: @anchors.right.ship_y,
-              w: 70,
-              h: 70,
-              path: "sprites/anchor.png",
-              angle: 0 }
+      end
+      if id == :middle and obj[:state] = :idle
+        @anchors.middle.ship_x = 613.5 - (@radius2 * Math.sin(@dangle2 - shangle))
+        @anchors.middle.ship_y = (801 - shipy) - (@radius2 * Math.cos(@dangle2 - shangle))
+        @waves << { x: @anchors.middle.ship_x,
+        y: @anchors.middle.ship_y,
+        w: 70,
+        h: 70,
+        path: "sprites/anchor.png",
+        angle: 0 }
+      end
+      if id == :right and obj[:state] = :idle
+        @anchors.right.ship_x = 613.5 + (@radius3 * Math.cos(@dangle3 - shangle))
+        @anchors.right.ship_y = (801 - shipy) - (@radius3 * Math.sin(@dangle3 - shangle))
+        @waves << { x: @anchors.right.ship_x,
+        y: @anchors.right.ship_y,
+        w: 70,
+        h: 70,
+        path: "sprites/anchor.png",
+        angle: 0 }
+      end
+    end
+  end
+
   @args_outputs.sprites << @waves
 end
 
