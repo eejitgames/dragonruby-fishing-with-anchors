@@ -5,6 +5,7 @@ def tick args
   @args_state   = args.state
   @args_inputs  = args.inputs
   @args_outputs = args.outputs
+  @args_easing = args.easing
   @args_gtk     = args.gtk
 
   current_scene = @args_state.current_scene
@@ -42,6 +43,7 @@ def tick_game_over_scene
   render_background_waves
   render_pirate_ship_fg_wave
   draw_anchors_and_chains
+  output_to_sprites
 
   if @args_inputs.mouse.click
     @args_state.next_scene = :title_scene
@@ -58,6 +60,7 @@ def tick_game_scene
   check_anchors_endpoint
   move_anchors_and_chains_inward
   draw_anchors_and_chains
+  output_to_sprites
   show_framerate
 
   if @args_inputs.mouse.click
@@ -86,6 +89,10 @@ def check_anchor_input
         end
         closest = distances.min_by { |item| item[:distance] }
         @anchors[closest.id].state = :outward
+        @anchors[closest.id].target_x = mouse_x - 70 # assumes end size of 140
+        @anchors[closest.id].target_y = mouse_y - 70 # assumes end size of 140
+        @anchors[closest.id].duration = 1.seconds
+        @anchors[closest.id].start = @my_tick_count
       end
     end
   end
@@ -95,6 +102,26 @@ def move_anchors_and_chains_outward
   outward_anchors = @anchors.select { |_, anchor| anchor[:state] == :outward }
   unless outward_anchors.empty?
     puts60 "there are some outward moving anchors"
+    outward_anchors.each_value do |anchor|
+      sx = anchor.ship_x
+      sy = anchor.ship_y
+      tx = anchor.target_x
+      ty = anchor.target_y      
+      prog = @args_easing.ease(anchor.start, @my_tick_count, anchor.duration, :smooth_stop_quad)
+      calc_x = sx + (tx - sx) * prog
+      calc_y = sy + (ty - sy) * prog
+      calc_w = 70 + (140 - 70) * prog
+      calc_h = 70 + (140 - 70) * prog
+      putz "calc_x: #{calc_x}"
+      putz "calc_y: #{calc_y}"
+      @waves << { x: calc_x,
+      y: calc_y,
+      w: calc_w,
+      h: calc_h,
+      path: "sprites/anchor.png",
+      angle: 0 }
+      anchor.state = :endpoint if prog >= 1
+    end
   end
 end
 
@@ -102,6 +129,10 @@ def check_anchors_endpoint
   endpoint_anchors = @anchors.select { |_, anchor| anchor[:state] == :endpoint }
   unless endpoint_anchors.empty?
     puts60 "some anchors are at the outermost endpoint"
+    endpoint_anchors.each_value do |anchor|
+      anchor.start = @my_tick_count
+      anchor.state = :inward
+    end
   end
 end
 
@@ -109,6 +140,38 @@ def move_anchors_and_chains_inward
   inward_anchors = @anchors.select { |_, anchor| anchor[:state] == :inward }
   unless inward_anchors.empty?
     puts60 "there are some inward moving anchors"
+    shangle = @position[@x_coor][:angle] * @convert
+    shipy = @position[@x_coor][:y]
+    inward_anchors.each do |id, anchor|
+      if id == :left
+        anchor.ship_x = 613.5 - (@radius1 * Math.sin(@dangle1 - shangle))
+        anchor.ship_y = (801 - shipy) - (@radius1 * Math.cos(@dangle1 - shangle))
+      end
+      if id == :middle
+        anchor.ship_x = 613.5 - (@radius2 * Math.sin(@dangle2 - shangle))
+        anchor.ship_y = (801 - shipy) - (@radius2 * Math.cos(@dangle2 - shangle))
+      end
+      if id == :right
+        anchor.ship_x = 613.5 + (@radius3 * Math.cos(@dangle3 - shangle))
+        anchor.ship_y = (801 - shipy) - (@radius3 * Math.sin(@dangle3 - shangle))
+      end
+      sx = anchor.target_x
+      sy = anchor.target_y      
+      tx = anchor.ship_x
+      ty = anchor.ship_y
+      prog = @args_easing.ease(anchor.start, @my_tick_count, anchor.duration, :smooth_start_quad)
+      calc_x = sx + (tx - sx) * prog
+      calc_y = sy + (ty - sy) * prog
+      calc_w = 140 + (70 - 140) * prog
+      calc_h = 140 + (70 - 140) * prog
+      @waves << { x: calc_x,
+      y: calc_y,
+      w: calc_w,
+      h: calc_h,
+      path: "sprites/anchor.png",
+      angle: 0 }
+      anchor.state = :idle if prog >= 1
+    end
   end
 end
 
@@ -145,7 +208,7 @@ def draw_anchors_and_chains
     shangle = @position[@x_coor][:angle] * @convert
     shipy = @position[@x_coor][:y]
     anchors = idle_anchors.map do |id, obj|
-      if id == :left and obj[:state] = :idle
+      if id == :left and obj[:state] == :idle
         @anchors.left.ship_x = 613.5 - (@radius1 * Math.sin(@dangle1 - shangle))
         @anchors.left.ship_y = (801 - shipy) - (@radius1 * Math.cos(@dangle1 - shangle))
         @waves << { x: @anchors.left.ship_x,
@@ -155,7 +218,7 @@ def draw_anchors_and_chains
               path: "sprites/anchor.png",
               angle: 0 }
       end
-      if id == :middle and obj[:state] = :idle
+      if id == :middle and obj[:state] == :idle
         @anchors.middle.ship_x = 613.5 - (@radius2 * Math.sin(@dangle2 - shangle))
         @anchors.middle.ship_y = (801 - shipy) - (@radius2 * Math.cos(@dangle2 - shangle))
         @waves << { x: @anchors.middle.ship_x,
@@ -165,7 +228,7 @@ def draw_anchors_and_chains
         path: "sprites/anchor.png",
         angle: 0 }
       end
-      if id == :right and obj[:state] = :idle
+      if id == :right and obj[:state] == :idle
         @anchors.right.ship_x = 613.5 + (@radius3 * Math.cos(@dangle3 - shangle))
         @anchors.right.ship_y = (801 - shipy) - (@radius3 * Math.sin(@dangle3 - shangle))
         @waves << { x: @anchors.right.ship_x,
@@ -177,7 +240,9 @@ def draw_anchors_and_chains
       end
     end
   end
+end
 
+def output_to_sprites
   @args_outputs.sprites << @waves
 end
 
@@ -220,7 +285,9 @@ def defaults
       anchor_x: 0,
       anchor_y: 0,
       target_x: 0,
-      target_y: 0
+      target_y: 0,
+      duration: 0,
+      start: 0
     },
     middle: {
       state: :idle,
@@ -229,7 +296,9 @@ def defaults
       anchor_x: 0,
       anchor_y: 0,
       target_x: 0,
-      target_y: 0
+      target_y: 0,
+      duration: 0,
+      start: 0
     },
     right: {
       state: :idle,
@@ -238,7 +307,9 @@ def defaults
       anchor_x: 0,
       anchor_y: 0,
       target_x: 0,
-      target_y: 0
+      target_y: 0,
+      duration: 0,
+      start: 0
     }
   }
   @args_state.defaults_set = true
