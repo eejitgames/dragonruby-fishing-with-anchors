@@ -101,7 +101,7 @@ end
 def move_anchors_and_chains_outward
   outward_anchors = @anchors.select { |_, anchor| anchor[:state] == :outward }
   unless outward_anchors.empty?
-    puts60 "there are some outward moving anchors"
+    # puts60 "there are some outward moving anchors"
     outward_anchors.each_value do |anchor|
       sx = anchor.ship_x
       sy = anchor.ship_y
@@ -112,8 +112,6 @@ def move_anchors_and_chains_outward
       calc_y = sy + (ty - sy) * prog
       calc_w = 70 + (140 - 70) * prog
       calc_h = 70 + (140 - 70) * prog
-      putz "calc_x: #{calc_x}"
-      putz "calc_y: #{calc_y}"
       @waves << { x: calc_x,
       y: calc_y,
       w: calc_w,
@@ -128,7 +126,7 @@ end
 def check_anchors_endpoint
   endpoint_anchors = @anchors.select { |_, anchor| anchor[:state] == :endpoint }
   unless endpoint_anchors.empty?
-    puts60 "some anchors are at the outermost endpoint"
+    # puts60 "some anchors are at the outermost endpoint"
     endpoint_anchors.each_value do |anchor|
       anchor.start = @my_tick_count
       anchor.state = :inward
@@ -139,7 +137,7 @@ end
 def move_anchors_and_chains_inward
   inward_anchors = @anchors.select { |_, anchor| anchor[:state] == :inward }
   unless inward_anchors.empty?
-    puts60 "there are some inward moving anchors"
+    # puts60 "there are some inward moving anchors"
     shangle = @position[@x_coor][:angle] * @convert
     shipy = @position[@x_coor][:y]
     inward_anchors.each do |id, anchor|
@@ -263,6 +261,7 @@ def show_framerate
   # (Across all methods in the class - in this case, the top most class)
   @show_fps = !@show_fps if @args_inputs.keyboard.key_down.forward_slash
   @args_outputs.primitives << @args_gtk.framerate_diagnostics_primitives if @show_fps
+  @my_tick_count -= 1 if @show_fps # hack to test freezing the game
 end
 
 def defaults
