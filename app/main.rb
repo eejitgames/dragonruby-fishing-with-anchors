@@ -42,7 +42,13 @@ end
 def tick_game_over_scene
   render_background_waves
   render_pirate_ship_fg_wave
+  move_anchors_and_chains_outward
+  move_anchors_and_chains_inward
   draw_anchors_and_chains
+  @args_outputs.labels << { x: 640,
+  y: 360,
+  text: "Game Over Scene (click to go to title)",
+  alignment_enum: 1 }
   output_to_sprites
 
   if @args_inputs.mouse.click
