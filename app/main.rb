@@ -89,14 +89,15 @@ def check_anchor_input
       idle_anchors = @anchors.select { |_, anchor| anchor[:state] == :idle }
       unless idle_anchors.empty?
         distances = idle_anchors.map do |id, obj|
-          # distance = Math.sqrt((mouse_x - obj[:ship_x])**2 + (mouse_y - obj[:ship_y])**2 )
-          distance = (mouse_x - obj[:ship_x])**2 + (mouse_y - obj[:ship_y])**2
+          # distance = Math.sqrt((mouse_x - obj[:ship.x])**2 + (mouse_y - obj[:ship.y])**2 )
+          # two styles of accessing the information shown here
+          distance = (mouse_x - obj.ship.x)**2 + (mouse_y - obj[:ship][:y])**2
           { id: id, distance: distance }
         end
         closest = distances.min_by { |item| item[:distance] }
         @anchors[closest.id].state = :outward
-        @anchors[closest.id].target_x = mouse_x - 70 # assumes end size of 140
-        @anchors[closest.id].target_y = mouse_y - 70 # assumes end size of 140
+        @anchors[closest.id].target.x = mouse_x - 70 # assumes end size of 140
+        @anchors[closest.id].target.y = mouse_y - 70 # assumes end size of 140
         @anchors[closest.id].duration = 1.seconds
         @anchors[closest.id].start = @my_tick_count
       end
@@ -109,10 +110,11 @@ def move_anchors_and_chains_outward
   unless outward_anchors.empty?
     # puts60 "there are some outward moving anchors"
     outward_anchors.each_value do |anchor|
-      sx = anchor.ship_x
-      sy = anchor.ship_y
-      tx = anchor.target_x
-      ty = anchor.target_y      
+      sx = anchor.ship.x
+      sy = anchor.ship.y
+      tx = anchor.target.x
+      ty = anchor.target.y    
+
       prog = @args_easing.ease(anchor.start, @my_tick_count, anchor.duration, :smooth_stop_quad)
       calc_x = sx + (tx - sx) * prog
       calc_y = sy + (ty - sy) * prog
@@ -148,21 +150,21 @@ def move_anchors_and_chains_inward
     shipy = @position[@x_coor][:y]
     inward_anchors.each do |id, anchor|
       if id == :left
-        anchor.ship_x = 613.5 - (@radius1 * Math.sin(@dangle1 - shangle))
-        anchor.ship_y = (801 - shipy) - (@radius1 * Math.cos(@dangle1 - shangle))
+        anchor.ship.x = 613.5 - (@radius1 * Math.sin(@dangle1 - shangle))
+        anchor.ship.y = (801 - shipy) - (@radius1 * Math.cos(@dangle1 - shangle))
       end
       if id == :middle
-        anchor.ship_x = 613.5 - (@radius2 * Math.sin(@dangle2 - shangle))
-        anchor.ship_y = (801 - shipy) - (@radius2 * Math.cos(@dangle2 - shangle))
+        anchor.ship.x = 613.5 - (@radius2 * Math.sin(@dangle2 - shangle))
+        anchor.ship.y = (801 - shipy) - (@radius2 * Math.cos(@dangle2 - shangle))
       end
       if id == :right
-        anchor.ship_x = 613.5 + (@radius3 * Math.cos(@dangle3 - shangle))
-        anchor.ship_y = (801 - shipy) - (@radius3 * Math.sin(@dangle3 - shangle))
+        anchor.ship.x = 613.5 + (@radius3 * Math.cos(@dangle3 - shangle))
+        anchor.ship.y = (801 - shipy) - (@radius3 * Math.sin(@dangle3 - shangle))
       end
-      sx = anchor.target_x
-      sy = anchor.target_y      
-      tx = anchor.ship_x
-      ty = anchor.ship_y
+      sx = anchor.target.x
+      sy = anchor.target.y      
+      tx = anchor.ship.x
+      ty = anchor.ship.y
       prog = @args_easing.ease(anchor.start, @my_tick_count, anchor.duration, :smooth_start_quad)
       calc_x = sx + (tx - sx) * prog
       calc_y = sy + (ty - sy) * prog
@@ -207,36 +209,38 @@ def render_pirate_ship_fg_wave
 end
 
 def draw_anchors_and_chains
+  # puts60 "ship.x: #{@anchors.left.ship.x}"
+  # puts60 "ship.y: #{@anchors.left.ship.y}"
   idle_anchors = @anchors.select { |_, anchor| anchor[:state] == :idle }
   unless idle_anchors.empty?
     shangle = @position[@x_coor][:angle] * @convert
     shipy = @position[@x_coor][:y]
     anchors = idle_anchors.map do |id, obj|
       if id == :left and obj[:state] == :idle
-        @anchors.left.ship_x = 613.5 - (@radius1 * Math.sin(@dangle1 - shangle))
-        @anchors.left.ship_y = (801 - shipy) - (@radius1 * Math.cos(@dangle1 - shangle))
-        @waves << { x: @anchors.left.ship_x,
-              y: @anchors.left.ship_y,
+        @anchors.left.ship.x = 613.5 - (@radius1 * Math.sin(@dangle1 - shangle))
+        @anchors.left.ship.y = (801 - shipy) - (@radius1 * Math.cos(@dangle1 - shangle))
+        @waves << { x: @anchors.left.ship.x,
+              y: @anchors.left.ship.y,
               w: 70,
               h: 70,
               path: "sprites/anchor.png",
               angle: 0 }
       end
       if id == :middle and obj[:state] == :idle
-        @anchors.middle.ship_x = 613.5 - (@radius2 * Math.sin(@dangle2 - shangle))
-        @anchors.middle.ship_y = (801 - shipy) - (@radius2 * Math.cos(@dangle2 - shangle))
-        @waves << { x: @anchors.middle.ship_x,
-        y: @anchors.middle.ship_y,
+        @anchors.middle.ship.x = 613.5 - (@radius2 * Math.sin(@dangle2 - shangle))
+        @anchors.middle.ship.y = (801 - shipy) - (@radius2 * Math.cos(@dangle2 - shangle))
+        @waves << { x: @anchors.middle.ship.x,
+        y: @anchors.middle.ship.y,
         w: 70,
         h: 70,
         path: "sprites/anchor.png",
         angle: 0 }
       end
       if id == :right and obj[:state] == :idle
-        @anchors.right.ship_x = 613.5 + (@radius3 * Math.cos(@dangle3 - shangle))
-        @anchors.right.ship_y = (801 - shipy) - (@radius3 * Math.sin(@dangle3 - shangle))
-        @waves << { x: @anchors.right.ship_x,
-        y: @anchors.right.ship_y,
+        @anchors.right.ship.x = 613.5 + (@radius3 * Math.cos(@dangle3 - shangle))
+        @anchors.right.ship.y = (801 - shipy) - (@radius3 * Math.sin(@dangle3 - shangle))
+        @waves << { x: @anchors.right.ship.x,
+        y: @anchors.right.ship.y,
         w: 70,
         h: 70,
         path: "sprites/anchor.png",
@@ -285,34 +289,61 @@ def defaults
   @anchors = {
     left: {
       state: :idle,
-      ship_x: 0,
-      ship_y: 0,
-      anchor_x: 0,
-      anchor_y: 0,
-      target_x: 0,
-      target_y: 0,
+      ship: 
+      {
+        x: 0,
+        y: 0
+      },
+      anchor: 
+      {
+        x: 0,
+        y: 0
+      },
+      target: 
+      {
+        x: 0,
+        y: 0
+      },
       duration: 0,
       start: 0
     },
     middle: {
       state: :idle,
-      ship_x: 0,
-      ship_y: 0,
-      anchor_x: 0,
-      anchor_y: 0,
-      target_x: 0,
-      target_y: 0,
+      ship: 
+      {
+        x: 0,
+        y: 0
+      },
+      anchor: 
+      {
+        x: 0,
+        y: 0
+      },
+      target: 
+      {
+        x: 0,
+        y: 0
+      },
       duration: 0,
       start: 0
     },
     right: {
       state: :idle,
-      ship_x: 0,
-      ship_y: 0,
-      anchor_x: 0,
-      anchor_y: 0,
-      target_x: 0,
-      target_y: 0,
+      ship: 
+      {
+        x: 0,
+        y: 0
+      },
+      anchor:
+      {
+        x: 0,
+        y: 0
+      },
+      target: 
+      {
+        x: 0,
+        y: 0
+      },
       duration: 0,
       start: 0
     }
