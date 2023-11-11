@@ -67,6 +67,7 @@ def tick_game_scene
   move_anchors_and_chains_outward
   check_anchors_endpoint
   move_anchors_and_chains_inward
+  swing_anchor_back_to_idle
   draw_anchors_and_chains
   output_to_sprites
   show_framerate
@@ -179,17 +180,70 @@ def move_anchors_and_chains_inward
       calc_w = 140 + (70 - 140) * prog
       calc_h = 140 + (70 - 140) * prog
       calc_a = @args_geometry.angle_from anchor.ship, anchor.target
+      anchor.angle = calc_a - 90
       @waves << { x: calc_x,
                   y: calc_y,
                   w: calc_w,
                   h: calc_h,
                   path: "sprites/anchor.png",
-                  angle: calc_a - 90,
+                  angle: anchor.angle,
                   anchor_x: 0.5,
                   anchor_y: 1,
                   angle_anchor_x: 0.5,
                   angle_anchor_y: 1.0 }
-      anchor.state = :idle if prog >= 1
+      anchor.state = :swing if prog >= 1
+    end
+  end
+end
+
+def swing_anchor_back_to_idle
+  swing_anchors = @anchors.select { |_, anchor| anchor[:state] == :swing }
+  unless swing_anchors.empty?
+    anchors = swing_anchors.map do |id, obj|
+      if id == :left and obj[:state] == :swing
+        @waves << { x: @anchors.left.ship.x,
+                    y: @anchors.left.ship.y,
+                    w: 70,
+                    h: 70,
+                    path: "sprites/anchor.png",
+                    anchor_x: 0.5,
+                    anchor_y: 1,
+                    angle_anchor_x: 0.5,
+                    angle_anchor_y: 1.0,
+                    angle: obj.angle }
+      end
+      if id == :middle and obj[:state] == :swing
+        @waves << { x: @anchors.middle.ship.x,
+                    y: @anchors.middle.ship.y,
+                    w: 70,
+                    h: 70,
+                    path: "sprites/anchor.png",
+                    anchor_x: 0.5,
+                    anchor_y: 1.0,
+                    angle_anchor_x: 0.5,
+                    angle_anchor_y: 1.0,
+                    angle: obj.angle }
+      end
+      if id == :right and obj[:state] == :swing
+        @waves << { x: @anchors.right.ship.x,
+                    y: @anchors.right.ship.y,
+                    w: 70,
+                    h: 70,
+                    path: "sprites/anchor.png",
+                    anchor_x: 0.5,
+                    anchor_y: 1.0,
+                    angle_anchor_x: 0.5,
+                    angle_anchor_y: 1.0,
+                    angle: obj.angle }
+      end
+      if obj.angle < 0
+        obj.angle += 10
+        obj.angle = 0 if obj.angle >= 0
+      else
+        obj.angle -= 10
+        obj.angle = 0 if obj.angle < 1
+      end
+      obj.state = :idle if obj.angle == 0
     end
   end
 end
@@ -320,7 +374,8 @@ def defaults
         y: 0
       },
       duration: 0,
-      start: 0
+      start: 0,
+      angle: 0
     },
     middle: {
       state: :idle,
@@ -340,7 +395,8 @@ def defaults
         y: 0
       },
       duration: 0,
-      start: 0
+      start: 0,
+      angle: 0
     },
     right: {
       state: :idle,
@@ -360,7 +416,8 @@ def defaults
         y: 0
       },
       duration: 0,
-      start: 0
+      start: 0,
+      angle: 0
     }
   }
   @args_state.defaults_set = true
