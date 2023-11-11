@@ -98,9 +98,9 @@ def check_anchor_input
         end
         closest = distances.min_by { |item| item[:distance] }
         @anchors[closest.id].state = :outward
-        @anchors[closest.id].target.x = mouse_x - 70 # assumes end size of 140
-        @anchors[closest.id].target.y = mouse_y - 70 # assumes end size of 140
-        @anchors[closest.id].duration = 10.seconds
+        @anchors[closest.id].target.x = mouse_x # assumes end size of 140
+        @anchors[closest.id].target.y = mouse_y # assumes end size of 140
+        @anchors[closest.id].duration = 1.seconds
         @anchors[closest.id].start = @my_tick_count
       end
     end
@@ -112,16 +112,16 @@ def update_all_anchor_ship_position
   shipy = @position[@x_coor][:y]
   anchors = @anchors.map do |id, obj|
     if id == :left
-      obj.ship.x = (419 + (458/2)) - (@radius1 * Math.sin(@dangle1 - shangle))
-      obj.ship.y = (869 - shipy) - (@radius1 * Math.cos(@dangle1 - shangle))
+      obj.ship.x = (419.5 + (458/2)) - (@radius1 * Math.sin(@dangle1 - shangle))
+      obj.ship.y = (871 - shipy) - (@radius1 * Math.cos(@dangle1 - shangle))
     end
     if id == :middle
-      obj.ship.x = (419 + (458/2)) - (@radius2 * Math.sin(@dangle2 - shangle))
-      obj.ship.y = (869 - shipy) - (@radius2 * Math.cos(@dangle2 - shangle))
+      obj.ship.x = (419.5 + (458/2)) - (@radius2 * Math.sin(@dangle2 - shangle))
+      obj.ship.y = (871 - shipy) - (@radius2 * Math.cos(@dangle2 - shangle))
     end
     if id == :right
-      obj.ship.x = (419 + (458/2)) + (@radius3 * Math.cos(@dangle3 - shangle))
-      obj.ship.y = (869 - shipy) - (@radius3 * Math.sin(@dangle3 - shangle))
+      obj.ship.x = (419.5 + (458/2)) + (@radius3 * Math.cos(@dangle3 - shangle))
+      obj.ship.y = (871 - shipy) - (@radius3 * Math.sin(@dangle3 - shangle))
     end
   end
 end
@@ -129,7 +129,6 @@ end
 def move_anchors_and_chains_outward
   outward_anchors = @anchors.select { |_, anchor| anchor[:state] == :outward }
   unless outward_anchors.empty?
-    # puts60 "there are some outward moving anchors"
     outward_anchors.each_value do |anchor|
       sx = anchor.ship.x
       sy = anchor.ship.y
@@ -159,7 +158,6 @@ end
 def check_anchors_endpoint
   endpoint_anchors = @anchors.select { |_, anchor| anchor[:state] == :endpoint }
   unless endpoint_anchors.empty?
-    # puts60 "some anchors are at the outermost endpoint"
     endpoint_anchors.each_value do |anchor|
       anchor.start = @my_tick_count
       anchor.state = :inward
@@ -170,24 +168,7 @@ end
 def move_anchors_and_chains_inward
   inward_anchors = @anchors.select { |_, anchor| anchor[:state] == :inward }
   unless inward_anchors.empty?
-    # puts60 "there are some inward moving anchors"
-    # shangle = @position[@x_coor][:angle] * @convert
-    # shipy = @position[@x_coor][:y]
     inward_anchors.each do |id, anchor|
-      #if id == :left
-        # anchor.ship.x = 613.5 - (@radius1 * Math.sin(@dangle1 - shangle))
-        # anchor.ship.y = (801 - shipy) - (@radius1 * Math.cos(@dangle1 - shangle))
-        # anchor.ship.x = (419 + (458/2)) - (@radius1 * Math.sin(@dangle1 - shangle))
-        # anchor.ship.y = (869 - shipy) - (@radius1 * Math.cos(@dangle1 - shangle))
-      #end
-      #if id == :middle
-        # anchor.ship.x = 613.5 - (@radius2 * Math.sin(@dangle2 - shangle))
-        # anchor.ship.y = (801 - shipy) - (@radius2 * Math.cos(@dangle2 - shangle))
-      #end
-      #if id == :right
-        # anchor.ship.x = 613.5 + (@radius3 * Math.cos(@dangle3 - shangle))
-        # anchor.ship.y = (801 - shipy) - (@radius3 * Math.sin(@dangle3 - shangle))
-      #end
       sx = anchor.target.x
       sy = anchor.target.y
       tx = anchor.ship.x
@@ -241,18 +222,10 @@ def render_pirate_ship_fg_wave
 end
 
 def draw_anchors_and_chains
-  # puts60 "ship.x: #{@anchors.left.ship.x}"
-  # puts60 "ship.y: #{@anchors.left.ship.y}"
   idle_anchors = @anchors.select { |_, anchor| anchor[:state] == :idle }
   unless idle_anchors.empty?
-    # shangle = @position[@x_coor][:angle] * @convert
-    # shipy = @position[@x_coor][:y]
     anchors = idle_anchors.map do |id, obj|
       if id == :left and obj[:state] == :idle
-        # @anchors.left.ship.x = 613.5 - (@radius1 * Math.sin(@dangle1 - shangle))
-        # @anchors.left.ship.y = (801 - shipy) - (@radius1 * Math.cos(@dangle1 - shangle))
-        # @anchors.left.ship.x = (419 + (458/2)) - (@radius1 * Math.sin(@dangle1 - shangle))
-        # @anchors.left.ship.y = (869 - shipy) - (@radius1 * Math.cos(@dangle1 - shangle))
         @waves << { x: @anchors.left.ship.x,
                     y: @anchors.left.ship.y,
                     w: 70,
@@ -265,31 +238,27 @@ def draw_anchors_and_chains
                     angle: 0 }
       end
       if id == :middle and obj[:state] == :idle
-        # @anchors.middle.ship.x = 613.5 - (@radius2 * Math.sin(@dangle2 - shangle))
-        # @anchors.middle.ship.y = (801 - shipy) - (@radius2 * Math.cos(@dangle2 - shangle))
-        # @anchors.middle.ship.x = (419 + (458/2)) - (@radius2 * Math.sin(@dangle2 - shangle))
-        # @anchors.middle.ship.y = (869 - shipy) - (@radius2 * Math.cos(@dangle2 - shangle))
         @waves << { x: @anchors.middle.ship.x,
                     y: @anchors.middle.ship.y,
                     w: 70,
                     h: 70,
                     path: "sprites/anchor.png",
                     anchor_x: 0.5,
-                    anchor_y: 1,
+                    anchor_y: 1.0,
+                    angle_anchor_x: 0.5,
+                    angle_anchor_y: 1.0,
                     angle: 0 }
       end
       if id == :right and obj[:state] == :idle
-        # @anchors.right.ship.x = 613.5 + (@radius3 * Math.cos(@dangle3 - shangle))
-        # @anchors.right.ship.y = (801 - shipy) - (@radius3 * Math.sin(@dangle3 - shangle))
-        # @anchors.right.ship.x = (419 + (458/2)) + (@radius3 * Math.cos(@dangle3 - shangle))
-        # @anchors.right.ship.y = (869 - shipy) - (@radius3 * Math.sin(@dangle3 - shangle))
         @waves << { x: @anchors.right.ship.x,
                     y: @anchors.right.ship.y,
                     w: 70,
                     h: 70,
                     path: "sprites/anchor.png",
                     anchor_x: 0.5,
-                    anchor_y: 1,
+                    anchor_y: 1.0,
+                    angle_anchor_x: 0.5,
+                    angle_anchor_y: 1.0,
                     angle: 0 }
       end
     end
