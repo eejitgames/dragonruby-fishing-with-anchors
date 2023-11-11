@@ -101,8 +101,10 @@ def check_anchor_input
         @anchors[closest.id].state = :outward
         @anchors[closest.id].target.x = mouse_x # assumes end size of 140
         @anchors[closest.id].target.y = mouse_y # assumes end size of 140
-        @anchors[closest.id].duration = 1.seconds
+        @anchors[closest.id].duration = (Math.sqrt closest.distance ) / 7
+        @anchors[closest.id].duration = @anchors[closest.id].duration.cap_min_max(25, 55)
         @anchors[closest.id].start = @my_tick_count
+        # putz "distance: #{@anchors[closest.id].duration}"
       end
     end
   end
@@ -135,7 +137,7 @@ def move_anchors_and_chains_outward
       sy = anchor.ship.y
       tx = anchor.target.x
       ty = anchor.target.y
-      prog = @args_easing.ease(anchor.start, @my_tick_count, anchor.duration, :smooth_stop_quint)
+      prog = @args_easing.ease(anchor.start, @my_tick_count, anchor.duration, :smooth_stop_quad)
       calc_x = sx + (tx - sx) * prog
       calc_y = sy + (ty - sy) * prog
       calc_w = 70 + (140 - 70) * prog
