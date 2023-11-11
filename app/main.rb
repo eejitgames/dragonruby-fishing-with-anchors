@@ -135,7 +135,7 @@ def move_anchors_and_chains_outward
       sy = anchor.ship.y
       tx = anchor.target.x
       ty = anchor.target.y
-      prog = @args_easing.ease(anchor.start, @my_tick_count, anchor.duration, :smooth_stop_quad)
+      prog = @args_easing.ease(anchor.start, @my_tick_count, anchor.duration, :smooth_stop_quint)
       calc_x = sx + (tx - sx) * prog
       calc_y = sy + (ty - sy) * prog
       calc_w = 70 + (140 - 70) * prog
@@ -174,7 +174,7 @@ def move_anchors_and_chains_inward
       sy = anchor.target.y
       tx = anchor.ship.x
       ty = anchor.ship.y
-      prog = @args_easing.ease(anchor.start, @my_tick_count, anchor.duration, :smooth_start_quad)
+      prog = @args_easing.ease(anchor.start, @my_tick_count, anchor.duration, :identity)
       calc_x = sx + (tx - sx) * prog
       calc_y = sy + (ty - sy) * prog
       calc_w = 140 + (70 - 140) * prog
