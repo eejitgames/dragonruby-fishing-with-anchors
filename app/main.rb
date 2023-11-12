@@ -1,3 +1,4 @@
+$gtk.reset
 $gtk.set_window_scale(0.75)
 
 def tick args
