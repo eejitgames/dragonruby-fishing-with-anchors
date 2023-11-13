@@ -240,10 +240,10 @@ def swing_anchor_back_to_idle
                     angle: obj.angle }
       end
       if obj.angle < 0
-        obj.angle += 10
-        obj.angle = 0 if obj.angle >= 0
+        obj.angle += 15
+        obj.angle = 0 if obj.angle > 0
       else
-        obj.angle -= 10
+        obj.angle -= 15
         obj.angle = 0 if obj.angle < 1
       end
       obj.state = :idle if obj.angle == 0
