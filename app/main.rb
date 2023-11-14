@@ -80,6 +80,8 @@ def tick_game_scene
 end
 
 def bump_timer
+  # add check here whether the game has focus or not
+  # if not, pause music, skip increment count, etc
   @scroll_point_at = @my_tick_count
   @my_tick_count += 1
 end
@@ -146,6 +148,16 @@ def move_anchors_and_chains_outward
       calc_a = @args_geometry.angle_from anchor.ship, anchor.target
       @waves << { x: calc_x,
                   y: calc_y,
+                  w: 70,
+                  h: 910,
+                  path: "sprites/chains.png",
+                  angle: calc_a - 90,
+                  anchor_x: 0.5,
+                  anchor_y: 0,
+                  angle_anchor_x: 0.5,
+                  angle_anchor_y: 0 }
+      @waves << { x: calc_x,
+                  y: calc_y,
                   w: calc_w,
                   h: calc_h,
                   path: "sprites/anchor.png",
@@ -184,6 +196,16 @@ def move_anchors_and_chains_inward
       calc_h = 140 + (70 - 140) * prog
       calc_a = @args_geometry.angle_from anchor.ship, anchor.target
       anchor.angle = calc_a - 90
+      @waves << { x: calc_x,
+                  y: calc_y,
+                  w: 70,
+                  h:910,
+                  path: "sprites/chains.png",
+                  angle: calc_a - 90,
+                  anchor_x: 0.5,
+                  anchor_y: 0,
+                  angle_anchor_x: 0.5,
+                  angle_anchor_y: 0 }
       @waves << { x: calc_x,
                   y: calc_y,
                   w: calc_w,
