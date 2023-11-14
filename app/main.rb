@@ -3,12 +3,12 @@ $gtk.set_window_scale(0.75)
 
 def tick args
   # using sample 02_input_basics/07_managing_scenes as an initial sort of starting point/template
-  @args_state   = args.state
-  @args_inputs  = args.inputs
-  @args_outputs = args.outputs
-  @args_easing = args.easing
+  @args_state    = args.state
+  @args_inputs   = args.inputs
+  @args_outputs  = args.outputs
+  @args_easing   = args.easing
   @args_geometry = args.geometry
-  @args_gtk     = args.gtk
+  @args_gtk      = args.gtk
 
   current_scene = @args_state.current_scene
 
@@ -148,8 +148,7 @@ def move_anchors_and_chains_outward
       calc_w = 70 + (140 - 70) * prog
       calc_h = 70 + (140 - 70) * prog
       calc_a = @args_geometry.angle_from anchor.ship, anchor.target
-      point = { x: calc_x, y: calc_y }
-      distance = @args_geometry.distance anchor.ship, point
+      distance = @args_geometry.distance anchor.ship, { x: calc_x, y: calc_y }
       distance = 910 if distance > 910
       @waves << { # where to render the render target
                   x: calc_x,
@@ -206,8 +205,7 @@ def move_anchors_and_chains_inward
       calc_h = 140 + (70 - 140) * prog
       calc_a = @args_geometry.angle_from anchor.ship, anchor.target
       anchor.angle = calc_a - 90
-      point = { x: calc_x, y: calc_y }
-      distance = @args_geometry.distance anchor.ship, point
+      distance = @args_geometry.distance anchor.ship, { x: calc_x, y: calc_y }
       distance = 910 if distance > 910
       @waves << { # where to render the render target
                   x: calc_x,
