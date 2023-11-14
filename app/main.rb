@@ -91,6 +91,8 @@ def check_anchor_input
   if @args_inputs.mouse.click
     mouse_x = @args_inputs.mouse.click.point.x
     mouse_y = @args_inputs.mouse.click.point.y
+    mouse_x = mouse_x.cap_min_max(0, 1280)
+    mouse_y = mouse_y.cap_min_max(0, 720)
     unless mouse_y > 340 # check in the main body of the front most wave, subject to change
       idle_anchors = @anchors.select { |_, anchor| anchor[:state] == :idle }
       unless idle_anchors.empty?
@@ -146,7 +148,17 @@ def move_anchors_and_chains_outward
       calc_w = 70 + (140 - 70) * prog
       calc_h = 70 + (140 - 70) * prog
       calc_a = @args_geometry.angle_from anchor.ship, anchor.target
-      @waves << { x: calc_x,
+      # make the background transparent
+      # @args_outputs[:clipped_area].background_color = [0, 0, 0, 0]
+      # set the w/h to match the screen
+      # @args_outputs[:clipped_area].w = 1280
+      # @args_outputs[:clipped_area].h = 720
+      # mark it as transient so that the render target isn't cached
+      # (since we are going to be changing it every frame)
+      # @args_outputs[:clipped_area].transient!
+      # @args_outputs[:clipped_area].sprites << @chains
+      @waves << { # where to render the render target
+                  x: calc_x,
                   y: calc_y,
                   w: 70,
                   h: 910,
@@ -380,6 +392,7 @@ def defaults
   @dangle2 = 0.1533323884
   @dangle3 = 0.8960553846
   @convert = Math::PI / 180
+  @chains = { x: 0, y: 0, w: 70, h: 910, path: "sprites/chains.png" }
   @anchors = {
     left: {
       state: :idle,
@@ -445,6 +458,7 @@ def defaults
       angle: 0
     }
   }
+  # techinically not everything is set yet, but it should be when the end is reached
   @args_state.defaults_set = true
   @position = { # used to follow the front most wave
     0 => { y: 384.0, angle: 0.0 },
