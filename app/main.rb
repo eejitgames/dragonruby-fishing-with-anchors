@@ -148,26 +148,24 @@ def move_anchors_and_chains_outward
       calc_w = 70 + (140 - 70) * prog
       calc_h = 70 + (140 - 70) * prog
       calc_a = @args_geometry.angle_from anchor.ship, anchor.target
-      # make the background transparent
-      # @args_outputs[:clipped_area].background_color = [0, 0, 0, 0]
-      # set the w/h to match the screen
-      # @args_outputs[:clipped_area].w = 1280
-      # @args_outputs[:clipped_area].h = 720
-      # mark it as transient so that the render target isn't cached
-      # (since we are going to be changing it every frame)
-      # @args_outputs[:clipped_area].transient!
-      # @args_outputs[:clipped_area].sprites << @chains
+      point = { x: calc_x, y: calc_y }
+      distance = @args_geometry.distance anchor.ship, point
+      distance = 910 if distance > 910
       @waves << { # where to render the render target
                   x: calc_x,
                   y: calc_y,
                   w: 70,
-                  h: 910,
+                  h: distance,
                   path: "sprites/chains.png",
                   angle: calc_a - 90,
                   anchor_x: 0.5,
                   anchor_y: 0,
                   angle_anchor_x: 0.5,
-                  angle_anchor_y: 0 }
+                  angle_anchor_y: 0,
+                  source_x: 0,
+                  source_y: 0,
+                  source_w: 70,
+                  source_h: distance, }
       @waves << { x: calc_x,
                   y: calc_y,
                   w: calc_w,
@@ -208,16 +206,24 @@ def move_anchors_and_chains_inward
       calc_h = 140 + (70 - 140) * prog
       calc_a = @args_geometry.angle_from anchor.ship, anchor.target
       anchor.angle = calc_a - 90
-      @waves << { x: calc_x,
+      point = { x: calc_x, y: calc_y }
+      distance = @args_geometry.distance anchor.ship, point
+      distance = 910 if distance > 910
+      @waves << { # where to render the render target
+                  x: calc_x,
                   y: calc_y,
                   w: 70,
-                  h:910,
+                  h: distance,
                   path: "sprites/chains.png",
                   angle: calc_a - 90,
                   anchor_x: 0.5,
                   anchor_y: 0,
                   angle_anchor_x: 0.5,
-                  angle_anchor_y: 0 }
+                  angle_anchor_y: 0,
+                  source_x: 0,
+                  source_y: 0,
+                  source_w: 70,
+                  source_h: distance, }
       @waves << { x: calc_x,
                   y: calc_y,
                   w: calc_w,
