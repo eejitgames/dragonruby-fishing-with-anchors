@@ -280,13 +280,13 @@ def swing_anchor_back_to_idle
       end
       # putz "angle: #{obj.angle}"
       if obj.angle > 180
-        obj.angle += 15
+        obj.angle += 20
         obj.angle = 0 if obj.angle > 360
       elsif obj.angle < 0
-        obj.angle += 15
+        obj.angle += 20
         obj.angle = 0 if obj.angle > 0
       else
-        obj.angle -=15
+        obj.angle -=20
         obj.angle = 0 if obj.angle < 1
       end
       obj.state = :idle if obj.angle == 0
