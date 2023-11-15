@@ -73,9 +73,9 @@ def tick_game_scene
   output_to_sprites
   show_framerate
 
-  if @args_inputs.mouse.click
+  if @args_inputs.mouse.button_right # mouse.click
     # for now, the top part of the screen ends the game scene
-    @args_state.next_scene = :game_over_scene if @args_inputs.mouse.click.point.y > 400
+    @args_state.next_scene = :game_over_scene # if @args_inputs.mouse.click.point.y > 400
   end
 end
 
@@ -93,7 +93,7 @@ def check_anchor_input
     mouse_y = @args_inputs.mouse.click.point.y
     mouse_x = mouse_x.cap_min_max(0, 1280)
     mouse_y = mouse_y.cap_min_max(0, 720)
-    unless mouse_y > 340 # check in the main body of the front most wave, subject to change
+    # unless mouse_y > 340 # check in the main body of the front most wave, subject to change
       idle_anchors = @anchors.select { |_, anchor| anchor[:state] == :idle }
       unless idle_anchors.empty?
         distances = idle_anchors.map do |id, obj|
@@ -111,7 +111,7 @@ def check_anchor_input
         @anchors[closest.id].start = @my_tick_count
         # putz "distance: #{@anchors[closest.id].duration}"
       end
-    end
+    # end
   end
 end
 
@@ -148,6 +148,7 @@ def move_anchors_and_chains_outward
       calc_w = 70 + (140 - 70) * prog
       calc_h = 70 + (140 - 70) * prog
       calc_a = @args_geometry.angle_from anchor.ship, anchor.target
+      # putz "angle: #{calc_a - 90}"
       distance = @args_geometry.distance anchor.ship, { x: calc_x, y: calc_y }
       distance = 910 if distance > 910
       @waves << { # where to render the render target
@@ -277,11 +278,15 @@ def swing_anchor_back_to_idle
                     angle_anchor_y: 1.0,
                     angle: obj.angle }
       end
-      if obj.angle < 0
+      # putz "angle: #{obj.angle}"
+      if obj.angle > 180
+        obj.angle += 15
+        obj.angle = 0 if obj.angle > 360
+      elsif obj.angle < 0
         obj.angle += 15
         obj.angle = 0 if obj.angle > 0
       else
-        obj.angle -= 15
+        obj.angle -=15
         obj.angle = 0 if obj.angle < 1
       end
       obj.state = :idle if obj.angle == 0
