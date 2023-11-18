@@ -65,7 +65,7 @@ def tick_game_scene
   render_pirate_ship_fg_wave
   update_all_anchor_ship_position
   check_anchor_input
-  # draw_and_move_fish
+  draw_and_move_fish
   move_anchors_and_chains_outward
   check_anchors_endpoint
   move_anchors_and_chains_inward
@@ -85,6 +85,21 @@ def bump_timer
   # if not, pause music, skip increment count, etc
   @scroll_point_at = @my_tick_count
   @my_tick_count += 1
+end
+
+def move_fish fish
+  fish.x += fish[:s]
+  # fish.y += fish[:s]
+  if fish.x > 1280 # || star.y > args.grid.h
+    fish.x = random_x
+    # fish.y = random_y
+    fish[:s] = random_speed
+  end
+end
+
+def draw_and_move_fish
+  @fish.each { |f| move_fish f }
+  @waves << @fish
 end
 
 def check_anchor_input
@@ -390,6 +405,27 @@ def show_framerate
   @my_tick_count -= 1 if @show_fps # hack to test freezing the game
 end
 
+def random_x
+  (1280.randomize :ratio) * -1
+end
+
+def random_y
+  (300.randomize :ratio)
+end
+
+def random_speed
+  1 + (4.randomize :ratio)
+end
+
+def new_fish
+  {
+    x: random_x,
+    y: random_y,
+    w: 64, h: 64, path: 'sprites/fishGreen.png',
+    s: random_speed
+  }
+end
+
 def defaults
   @my_tick_count = 0   # sort of shadowing the tick count, may prove useful
   @scroll_point_at = 0 # used for positioning sections of the scrolling background
@@ -403,6 +439,8 @@ def defaults
   @dangle3 = 0.8960553846
   @convert = Math::PI / 180
   @chains = { x: 0, y: 0, w: 70, h: 910, path: "sprites/chains.png" }
+  # fish inspiration from 09_performance/01_sprites_as_hash sample
+  @fish = 100.map { |i| new_fish }
   @anchors = {
     left: {
       state: :idle,
