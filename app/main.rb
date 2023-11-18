@@ -65,6 +65,7 @@ def tick_game_scene
   render_pirate_ship_fg_wave
   update_all_anchor_ship_position
   check_anchor_input
+  # draw_and_move_fish
   move_anchors_and_chains_outward
   check_anchors_endpoint
   move_anchors_and_chains_inward
@@ -142,11 +143,11 @@ def move_anchors_and_chains_outward
       sy = anchor.ship.y
       tx = anchor.target.x
       ty = anchor.target.y
-      prog = @args_easing.ease(anchor.start, @my_tick_count, anchor.duration, :smooth_stop_quad)
-      calc_x = sx + (tx - sx) * prog
-      calc_y = sy + (ty - sy) * prog
-      calc_w = 70 + (140 - 70) * prog
-      calc_h = 70 + (140 - 70) * prog
+      progress = @args_easing.ease(anchor.start, @my_tick_count, anchor.duration, :smooth_stop_quad)
+      calc_x = sx + (tx - sx) * progress
+      calc_y = sy + (ty - sy) * progress
+      calc_w = 70 + (140 - 70) * progress
+      calc_h = 70 + (140 - 70) * progress
       calc_a = @args_geometry.angle_from anchor.ship, anchor.target
       # putz "angle: #{calc_a - 90}"
       distance = @args_geometry.distance anchor.ship, { x: calc_x, y: calc_y }
@@ -176,7 +177,7 @@ def move_anchors_and_chains_outward
                   anchor_y: 1,
                   angle_anchor_x: 0.5,
                   angle_anchor_y: 1.0 }
-      anchor.state = :endpoint if prog >= 1
+      anchor.state = :endpoint if progress >= 1
     end
   end
 end
@@ -199,11 +200,11 @@ def move_anchors_and_chains_inward
       sy = anchor.target.y
       tx = anchor.ship.x
       ty = anchor.ship.y
-      prog = @args_easing.ease(anchor.start, @my_tick_count, anchor.duration, :identity)
-      calc_x = sx + (tx - sx) * prog
-      calc_y = sy + (ty - sy) * prog
-      calc_w = 140 + (70 - 140) * prog
-      calc_h = 140 + (70 - 140) * prog
+      progress = @args_easing.ease(anchor.start, @my_tick_count, anchor.duration, :identity)
+      calc_x = sx + (tx - sx) * progress
+      calc_y = sy + (ty - sy) * progress
+      calc_w = 140 + (70 - 140) * progress
+      calc_h = 140 + (70 - 140) * progress
       calc_a = @args_geometry.angle_from anchor.ship, anchor.target
       anchor.angle = calc_a - 90
       distance = @args_geometry.distance anchor.ship, { x: calc_x, y: calc_y }
@@ -233,7 +234,7 @@ def move_anchors_and_chains_inward
                   anchor_y: 1,
                   angle_anchor_x: 0.5,
                   angle_anchor_y: 1.0 }
-      anchor.state = :swing if prog >= 1
+      anchor.state = :swing if progress >= 1
     end
   end
 end
