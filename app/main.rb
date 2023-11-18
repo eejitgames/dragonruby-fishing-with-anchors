@@ -44,6 +44,7 @@ end
 def tick_game_over_scene
   render_background_waves
   render_pirate_ship_fg_wave
+  draw_fish
   move_anchors_and_chains_outward
   move_anchors_and_chains_inward
   draw_anchors_and_chains
@@ -65,7 +66,8 @@ def tick_game_scene
   render_pirate_ship_fg_wave
   update_all_anchor_ship_position
   check_anchor_input
-  draw_and_move_fish
+  draw_fish
+  move_fish
   move_anchors_and_chains_outward
   check_anchors_endpoint
   move_anchors_and_chains_inward
@@ -84,10 +86,10 @@ def bump_timer
   # add check here whether the game has focus or not
   # if not, pause music, skip increment count, etc
   @scroll_point_at = @my_tick_count
-  @my_tick_count += 1
+  @my_tick_count += 1 unless @show_fps
 end
 
-def move_fish fish
+def move_single_fish fish
   fish.x += fish[:s]
   # fish.y += fish[:s]
   if fish.x > 1280 # || star.y > args.grid.h
@@ -97,9 +99,12 @@ def move_fish fish
   end
 end
 
-def draw_and_move_fish
-  @fish.each { |f| move_fish f }
+def draw_fish
   @waves << @fish
+end
+
+def move_fish
+  @fish.each { |f| move_single_fish f } unless @show_fps
 end
 
 def check_anchor_input
@@ -402,7 +407,7 @@ def show_framerate
   # (Across all methods in the class - in this case, the top most class)
   @show_fps = !@show_fps if @args_inputs.keyboard.key_down.forward_slash
   @args_outputs.primitives << @args_gtk.framerate_diagnostics_primitives if @show_fps
-  @my_tick_count -= 1 if @show_fps # hack to test freezing the game
+  # @my_tick_count -= 1 if @show_fps # hack to test freezing the game
 end
 
 def random_x
@@ -410,7 +415,7 @@ def random_x
 end
 
 def random_y
-  (300.randomize :ratio)
+  (300.randomize :ratio) - 8
 end
 
 def random_speed
@@ -418,10 +423,13 @@ def random_speed
 end
 
 def new_fish
+  fish_size = @fish_sizes_weighted.sample
   {
     x: random_x,
     y: random_y,
-    w: 64, h: 64, path: 'sprites/fishGreen.png',
+    w: fish_size.w,
+    h: fish_size.h,
+    path: 'sprites/fishGreen.png',
     s: random_speed
   }
 end
@@ -430,6 +438,7 @@ def defaults
   @my_tick_count = 0   # sort of shadowing the tick count, may prove useful
   @scroll_point_at = 0 # used for positioning sections of the scrolling background
   @wave_speed = 0.2
+  @show_fps = nil
   # some magic numbers worked out based on the ship sprite
   @radius1 = 164.2680736
   @radius2 = 111.3058848
@@ -440,6 +449,16 @@ def defaults
   @convert = Math::PI / 180
   @chains = { x: 0, y: 0, w: 70, h: 910, path: "sprites/chains.png" }
   # fish inspiration from 09_performance/01_sprites_as_hash sample
+  @fish_sizes = [
+    { size: { h: 32, w: 32 }, weight: 1},
+    { size: { h: 48, w: 48 }, weight: 2},
+    { size: { h: 48, w: 64 }, weight: 3},
+    { size: { h: 64, w: 64 }, weight: 4},
+    { size: { h: 64, w: 80 }, weight: 3},
+    { size: { h: 80, w: 96 }, weight: 2},
+    { size: { h: 96, w: 96 }, weight: 1}
+  ]
+  @fish_sizes_weighted = @fish_sizes.flat_map { |size| [size[:size]] * size[:weight] }
   @fish = 100.map { |i| new_fish }
   @anchors = {
     left: {
