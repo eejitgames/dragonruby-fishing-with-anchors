@@ -76,7 +76,7 @@ def tick_game_scene
   output_to_sprites
   show_framerate
 
-  if @args_inputs.mouse.button_right # mouse.click
+  if @args_inputs.keyboard.key_down.forward_slash # @args_inputs.mouse.button_right # mouse.click
     # for now, the top part of the screen ends the game scene
     @args_state.next_scene = :game_over_scene # if @args_inputs.mouse.click.point.y > 400
   end
@@ -86,13 +86,12 @@ def bump_timer
   # add check here whether the game has focus or not
   # if not, pause music, skip increment count, etc
   @scroll_point_at = @my_tick_count
-  @my_tick_count += 1 unless @show_fps
+  @my_tick_count += 1 # unless @show_fps
 end
 
 def move_single_fish fish
   # multiple sprites inspiration from 03_rendering_sprites/01_animation_using_separate_pngs sample
-  sprite_index = fish.l.frame_index 2, 20, true
-  fish.path = "sprites/fishGreen_#{sprite_index}.png"
+  fish.path = "sprites/fish#{fish.c}_#{fish.l.frame_index 2, 20, true}.png"
   fish.x += fish[:s]
   # fish.y += fish[:s]
   if fish.x > 1280 # || star.y > args.grid.h
@@ -107,7 +106,7 @@ def draw_fish
 end
 
 def move_fish
-  @fish.each { |f| move_single_fish f } unless @show_fps
+  @fish.each { |f| move_single_fish f } # unless @show_fps
 end
 
 def check_anchor_input
@@ -323,13 +322,13 @@ def render_background_waves
   # parallax inspiration from 99_genre_arcade/flappy_dragon sample
   @waves = []
   @x_coor = x_coor(@scroll_point_at, @wave_speed)
-  @waves << scrolling_background(@x_coor, 'sprites/water5.png', 240)
+  @waves << scrolling_background(@x_coor, "sprites/water5.png", 240)
   @x_coor = x_coor(@scroll_point_at, @wave_speed * 2)
-  @waves << scrolling_background(@x_coor, 'sprites/water4.png', 182)
+  @waves << scrolling_background(@x_coor, "sprites/water4.png", 182)
   @x_coor = x_coor(@scroll_point_at, @wave_speed * 4)
-  @waves << scrolling_background(@x_coor, 'sprites/water3.png', 122)
+  @waves << scrolling_background(@x_coor, "sprites/water3.png", 122)
   @x_coor = x_coor(@scroll_point_at, @wave_speed * 8)
-  @waves << scrolling_background(@x_coor, 'sprites/water2.png', 60)
+  @waves << scrolling_background(@x_coor, "sprites/water2.png", 60)
   @x_coor = x_coor(@scroll_point_at, @wave_speed * 16)
 end
 
@@ -342,7 +341,7 @@ def render_pirate_ship_fg_wave
               path: "sprites/ship.png",
               angle: ((@position[@x_coor][:angle])),
               a: 255 }
-  @waves << scrolling_background(@x_coor, 'sprites/water1.png')
+  @waves << scrolling_background(@x_coor, "sprites/water1.png")
 end
 
 def draw_anchors_and_chains
@@ -408,7 +407,7 @@ def show_framerate
   # @variables are called instance variables in ruby.
   # Which means you can access these variables in ANY METHOD inside the class.
   # (Across all methods in the class - in this case, the top most class)
-  @show_fps = !@show_fps if @args_inputs.keyboard.key_down.forward_slash
+  @show_fps = !@show_fps if @args_inputs.keyboard.key_down.f # orward_slash
   @args_outputs.primitives << @args_gtk.framerate_diagnostics_primitives if @show_fps
   # @my_tick_count -= 1 if @show_fps # hack to test freezing the game
 end
@@ -427,14 +426,16 @@ end
 
 def new_fish
   fish_size = @fish_sizes_weighted.sample
+  fish_color = @fish_colors_weighted.sample
   {
     x: random_x,
     y: random_y,
     w: fish_size.w,
     h: fish_size.h,
-    path: 'sprites/fishGreen_0.png',
+    path: "sprites/fish#{fish_color}_0.png",
     s: random_speed,
-    l: @my_tick_count
+    l: @my_tick_count,
+    c: fish_color
   }
 end
 
@@ -453,6 +454,9 @@ def defaults
   @convert = Math::PI / 180
   @chains = { x: 0, y: 0, w: 70, h: 910, path: "sprites/chains.png" }
   # fish inspiration from 09_performance/01_sprites_as_hash sample
+  @fish_colors_weighted = [
+    "Green"
+  ]
   @fish_sizes_weighted = [
     { h: 32, w: 32 },
     { h: 48, w: 48 },
