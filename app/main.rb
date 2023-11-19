@@ -415,7 +415,7 @@ def random_x
 end
 
 def random_y
-  (300.randomize :ratio) - 8
+  (300.randomize :ratio) - 12
 end
 
 def random_speed
@@ -449,16 +449,24 @@ def defaults
   @convert = Math::PI / 180
   @chains = { x: 0, y: 0, w: 70, h: 910, path: "sprites/chains.png" }
   # fish inspiration from 09_performance/01_sprites_as_hash sample
-  @fish_sizes = [
-    { size: { h: 32, w: 32 }, weight: 1},
-    { size: { h: 48, w: 48 }, weight: 2},
-    { size: { h: 48, w: 64 }, weight: 3},
-    { size: { h: 64, w: 64 }, weight: 4},
-    { size: { h: 64, w: 80 }, weight: 3},
-    { size: { h: 80, w: 96 }, weight: 2},
-    { size: { h: 96, w: 96 }, weight: 1}
+  @fish_sizes_weighted = [
+    { h: 32, w: 32 },
+    { h: 48, w: 48 },
+    { h: 48, w: 48 },
+    { h: 48, w: 64 },
+    { h: 48, w: 64 },
+    { h: 48, w: 64 },
+    { h: 64, w: 64 },
+    { h: 64, w: 64 },
+    { h: 64, w: 64 },
+    { h: 64, w: 64 },
+    { h: 64, w: 80 },
+    { h: 64, w: 80 },
+    { h: 64, w: 80 },
+    { h: 80, w: 96 },
+    { h: 80, w: 96 },
+    { h: 96, w: 96 }
   ]
-  @fish_sizes_weighted = @fish_sizes.flat_map { |size| [size[:size]] * size[:weight] }
   @fish = 100.map { |i| new_fish }
   @anchors = {
     left: {
