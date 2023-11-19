@@ -90,6 +90,9 @@ def bump_timer
 end
 
 def move_single_fish fish
+  # multiple sprites inspiration from 03_rendering_sprites/01_animation_using_separate_pngs sample
+  sprite_index = fish.l.frame_index 2, 20, true
+  fish.path = "sprites/fishGreen_#{sprite_index}.png"
   fish.x += fish[:s]
   # fish.y += fish[:s]
   if fish.x > 1280 # || star.y > args.grid.h
@@ -429,8 +432,9 @@ def new_fish
     y: random_y,
     w: fish_size.w,
     h: fish_size.h,
-    path: 'sprites/fishGreen.png',
-    s: random_speed
+    path: 'sprites/fishGreen_0.png',
+    s: random_speed,
+    l: @my_tick_count
   }
 end
 
