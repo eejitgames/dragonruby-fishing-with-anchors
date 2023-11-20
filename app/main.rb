@@ -91,7 +91,7 @@ end
 
 def move_single_fish fish
   # multiple sprites inspiration from 03_rendering_sprites/01_animation_using_separate_pngs sample
-  fish.path = "sprites/fish#{fish.c}_#{fish.l.frame_index 2, 20, true}.png"
+  fish.path = "sprites/fishGrayscale_#{fish.l.frame_index 2, 20, true}.png"
   fish.x += fish[:s]
   if fish[:s] > 0
     if fish.x > 1280
@@ -419,18 +419,23 @@ end
 
 def new_fish
   fish_size = @fish_sizes_weighted.sample
+  fish_color = @fish_colors_weighted.sample
   if rand < 0.5
-  {
-    x: (1280.randomize :ratio) * -1,
-    y: (300.randomize :ratio) - 12,
-    w: fish_size.w,
-    h: fish_size.h,
-    path: "sprites/fish#{@fish_colors_weighted.sample}_0.png",
-    s: 1 + (4.randomize :ratio),
-    l: @my_tick_count,
-    c: @fish_colors_weighted.sample,
-    flip_horizontally: true
-  }
+    {
+      x: (1280.randomize :ratio) * -1,
+      y: (300.randomize :ratio) - 12,
+      w: fish_size.w,
+      h: fish_size.h,
+      path: "sprites/fishGrayscale_0.png",
+      s: 1 + (4.randomize :ratio),
+      l: @my_tick_count,
+      c: @fish_colors_weighted.sample,
+      flip_horizontally: true,
+      a: 255,
+      r: fish_color.r,
+      g: fish_color.g,
+      b: fish_color.b
+    }
   else
     {
       x: (1280.randomize :ratio) + 1280,
@@ -441,7 +446,11 @@ def new_fish
       s: (1 + (4.randomize :ratio)) * -1,
       l: @my_tick_count,
       c: @fish_colors_weighted.sample,
-      flip_horizontally: false
+      flip_horizontally: false,
+      a: 255,
+      r: fish_color.r,
+      g: fish_color.g,
+      b: fish_color.b
     }
   end
 end
@@ -462,10 +471,14 @@ def defaults
   @chains = { x: 0, y: 0, w: 70, h: 910, path: "sprites/chains.png" }
   # fish inspiration from 09_performance/01_sprites_as_hash sample
   @fish_colors_weighted = [
-    "Green",
-    "Green",
-    "Green",
-    "Pink"
+    { r: 255, g: 173, b: 173 }, # FFADAD
+    { r: 255, g: 214, b: 165 }, # FFD6A5
+    { r: 253, g: 255, b: 182 }, # FDFFB6
+    { r: 202, g: 255, b: 191 }, # CAFFBF
+    { r: 155, g: 246, b: 255 }, # 9BF6FF
+    { r: 160, g: 196, b: 255 }, # A0C4FF
+    { r: 189, g: 178, b: 255 }, # BDB2FF
+    { r: 255, g: 198, b: 255 }  # FFC6FF
   ]
   @fish_sizes_weighted = [
     { h: 32, w: 32 },
