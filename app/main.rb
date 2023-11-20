@@ -111,7 +111,16 @@ def draw_fish
 end
 
 def move_fish
-  @fish.each { |f| move_single_fish f } # unless @show_fps
+  # @fish.each { |f| move_single_fish f } # unless @show_fps
+  # Fn.each(@fish) { |f| move_single_fish f }
+  # levi performance tricks
+  a = @fish
+  l = a.length
+  i = 0
+  while i < l
+    move_single_fish(a[i])
+    i += 1
+  end
 end
 
 def check_anchor_input
