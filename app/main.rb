@@ -93,11 +93,16 @@ def move_single_fish fish
   # multiple sprites inspiration from 03_rendering_sprites/01_animation_using_separate_pngs sample
   fish.path = "sprites/fish#{fish.c}_#{fish.l.frame_index 2, 20, true}.png"
   fish.x += fish[:s]
-  # fish.y += fish[:s]
-  if fish.x > 1280 # || star.y > args.grid.h
-    fish.x = random_x
-    # fish.y = random_y
-    fish[:s] = random_speed
+  if fish[:s] > 0
+    if fish.x > 1280
+      fish.x = (1280.randomize :ratio) * -1
+      fish[:s] = 1 + (4.randomize :ratio)
+    end
+  else
+    if fish.x < -128
+      fish.x = (1280.randomize :ratio) + 1280
+      fish[:s] = (1 + (4.randomize :ratio)) * -1
+    end
   end
 end
 
@@ -412,31 +417,33 @@ def show_framerate
   # @my_tick_count -= 1 if @show_fps # hack to test freezing the game
 end
 
-def random_x
-  (1280.randomize :ratio) * -1
-end
-
-def random_y
-  (300.randomize :ratio) - 12
-end
-
-def random_speed
-  1 + (4.randomize :ratio)
-end
-
 def new_fish
   fish_size = @fish_sizes_weighted.sample
-  fish_color = @fish_colors_weighted.sample
+  if rand < 0.5
   {
-    x: random_x,
-    y: random_y,
+    x: (1280.randomize :ratio) * -1,
+    y: (300.randomize :ratio) - 12,
     w: fish_size.w,
     h: fish_size.h,
-    path: "sprites/fish#{fish_color}_0.png",
-    s: random_speed,
+    path: "sprites/fish#{@fish_colors_weighted.sample}_0.png",
+    s: 1 + (4.randomize :ratio),
     l: @my_tick_count,
-    c: fish_color
+    c: @fish_colors_weighted.sample,
+    flip_horizontally: true
   }
+  else
+    {
+      x: (1280.randomize :ratio) + 1280,
+      y: (300.randomize :ratio) - 12,
+      w: fish_size.w,
+      h: fish_size.h,
+      path: "sprites/fish#{@fish_colors_weighted.sample}_0.png",
+      s: (1 + (4.randomize :ratio)) * -1,
+      l: @my_tick_count,
+      c: @fish_colors_weighted.sample,
+      flip_horizontally: false
+    }
+  end
 end
 
 def defaults
@@ -455,7 +462,10 @@ def defaults
   @chains = { x: 0, y: 0, w: 70, h: 910, path: "sprites/chains.png" }
   # fish inspiration from 09_performance/01_sprites_as_hash sample
   @fish_colors_weighted = [
-    "Green"
+    "Green",
+    "Green",
+    "Green",
+    "Pink"
   ]
   @fish_sizes_weighted = [
     { h: 32, w: 32 },
