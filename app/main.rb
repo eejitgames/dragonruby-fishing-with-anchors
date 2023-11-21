@@ -85,14 +85,23 @@ end
 def bump_timer
   # add check here whether the game has focus or not
   # if not, pause music, skip increment count, etc
-  @scroll_point_at = @my_tick_count
-  @my_tick_count += 1 # unless @show_fps
+  if !@args_inputs.keyboard.has_focus && @args_state.tick_count != 0
+    @game_paused = true
+    @args_outputs.labels << { x: 640,
+                              y: 360,
+                              text: "Game Paused",
+                              alignment_enum: 1 }
+  else
+    @scroll_point_at = @my_tick_count
+    @my_tick_count += 1 # unless @show_fps
+    @game_paused = nil
+  end
 end
 
 def move_single_fish fish
   # multiple sprites inspiration from 03_rendering_sprites/01_animation_using_separate_pngs sample
-  fish.path = "sprites/fishGrayscale_#{fish.l.frame_index 2, 20, true}.png"
-  fish.x += fish[:s]
+  fish.path = "sprites/fishGrayscale_#{fish.l.frame_index 2, 20, true, @my_tick_count}.png"
+  fish.x += fish[:s] unless @game_paused
   if fish[:s] > 0
     if fish.x > 1280
       fish.x = (1280.randomize :ratio) * -1
@@ -469,6 +478,7 @@ def defaults
   @scroll_point_at = 0 # used for positioning sections of the scrolling background
   @wave_speed = 0.2
   @show_fps = nil
+  @game_paused = nil
   # some magic numbers worked out based on the ship sprite
   @radius1 = 164.2680736
   @radius2 = 111.3058848
