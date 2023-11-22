@@ -65,7 +65,7 @@ def tick_game_scene
   render_background_waves
   render_pirate_ship_fg_wave
   update_all_anchor_ship_position
-  check_anchor_input
+  check_anchor_input unless @game_paused
   draw_fish
   move_fish
   move_anchors_and_chains_outward
@@ -102,6 +102,8 @@ def move_single_fish fish
   # multiple sprites inspiration from 03_rendering_sprites/01_animation_using_separate_pngs sample
   fish.path = "sprites/fishGrayscale_#{fish.l.frame_index 2, 20, true, @my_tick_count}.png"
   fish.x += fish[:s] unless @game_paused
+  fish.y = fish.y + (2 * rand + 2).*(0.25).randomize(:ratio, :sign) unless @game_paused
+  fish.y = fish.y.cap_min_max(-12, 288)
   if fish[:s] > 0
     if fish.x > 1280
       fish.x = (1280.randomize :ratio) * -1
