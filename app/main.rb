@@ -107,11 +107,13 @@ def move_single_fish fish
   if fish[:s] > 0
     if fish.x > 1280
       fish.x = (1280.randomize :ratio) * -1
+      fish.y = (300.randomize :ratio) - 12
       fish[:s] = 1 + (4.randomize :ratio)
     end
   else
     if fish.x < -128
       fish.x = (1280.randomize :ratio) + 1280
+      fish.y = (300.randomize :ratio) - 12
       fish[:s] = (1 + (4.randomize :ratio)) * -1
     end
   end
