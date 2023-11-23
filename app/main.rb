@@ -226,17 +226,19 @@ def move_anchors_and_chains_outward
                   anchor_y: 1,
                   angle_anchor_x: 0.5,
                   angle_anchor_y: 1.0 }
-      center_x = calc_x + (calc_w /1.8) * Math.cos((calc_a - 180) * @convert)
-      center_y = calc_y + (calc_h /1.8) * Math.sin((calc_a - 180) * @convert)
-      @waves << { x: center_x,
-                  y: center_y,
-                  w: 2,
-                  h: 2,
-                  path: :pixel,
-                  a: 255,
-                  r: 255,
-                  g: 255,
-                  b: 255 }
+      center_x = calc_x + (calc_w /1.9) * Math.cos((calc_a - 180) * @convert)
+      center_y = calc_y + (calc_h /1.9) * Math.sin((calc_a - 180) * @convert)
+      #@waves << { x: center_x,
+      #            y: center_y,
+      #            w: calc_w * 0.8, # w: 2,
+      #            h: calc_h * 0.8, # h: 2,
+      #            path: "sprites/circle-white.png", # path: :pixel,
+      #            anchor_x: 0.5,
+      #            anchor_y: 0.5,
+      #            a: 25,
+      #            r: 255,
+      #            g: 255,
+      #            b: 255 }
       anchor.state = :endpoint if progress >= 1
     end
   end
@@ -294,17 +296,19 @@ def move_anchors_and_chains_inward
                   anchor_y: 1,
                   angle_anchor_x: 0.5,
                   angle_anchor_y: 1.0 }
-      center_x = calc_x + (calc_w/1.8) * Math.cos((calc_a - 180) * @convert)
-      center_y = calc_y + (calc_h/1.8) * Math.sin((calc_a - 180) * @convert)
-      @waves << { x: center_x,
-                  y: center_y,
-                  w: 2,
-                  h: 2,
-                  path: :pixel,
-                  a: 255,
-                  r: 255,
-                  g: 255,
-                  b: 255 }
+      center_x = calc_x + (calc_w /1.9) * Math.cos((calc_a - 180) * @convert)
+      center_y = calc_y + (calc_h /1.9) * Math.sin((calc_a - 180) * @convert)
+      #@waves << { x: center_x,
+      #            y: center_y,
+      #            w: calc_w * 0.8, # w: 2,
+      #            h: calc_h * 0.8, # h: 2,
+      #            path: "sprites/circle-white.png", # path: :pixel,
+      #            anchor_x: 0.5,
+      #            anchor_y: 0.5,
+      #            a: 25,
+      #            r: 255,
+      #            g: 255,
+      #            b: 255 }
       anchor.state = :swing if progress >= 1
     end
   end
