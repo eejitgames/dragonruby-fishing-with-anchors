@@ -1,5 +1,6 @@
 $gtk.reset
 $gtk.set_window_scale(0.75)
+$gtk.disable_console if $gtk.production?
 
 def tick args
   # using sample 02_input_basics/07_managing_scenes as an initial sort of starting point/template
@@ -76,6 +77,16 @@ def tick_game_scene
   output_to_sprites
   show_framerate
 
+  #@args_outputs.labels << { x: 640,
+  #                          y: 360,
+  #                          text: "#{@args_gtk.current_framerate_render} fps render, #{@args_gtk.current_framerate_calc} fps simulation",
+  #                          size_enum: 20,
+  #                          r: 255,
+  #                          g: 0,
+  #                          b: 0,
+  #                          alignment_enum: 1,
+  #                          vertical_alignment_enum: 1 }
+
   if @args_inputs.keyboard.key_down.forward_slash # @args_inputs.mouse.button_right # mouse.click
     # for now, the top part of the screen ends the game scene
     @args_state.next_scene = :game_over_scene # if @args_inputs.mouse.click.point.y > 400
@@ -104,6 +115,17 @@ def move_single_fish fish
   fish.x += fish[:s] unless @game_paused
   fish.y = fish.y + (2 * rand + 2).*(0.25).randomize(:ratio, :sign) unless @game_paused
   fish.y = fish.y.cap_min_max(-12, 288)
+  #@waves << { x: fish.x,
+  #            y: fish.y,
+  #            w: fish.w * 0.8,
+  #            h: fish.h * 0.8,
+  #            path: "sprites/circle-white.png", # path: :pixel,
+  #            anchor_x: -0.1,
+  #            anchor_y: -0.1,
+  #            a: 25,
+  #            r: 255,
+  #            g: 255,
+  #            b: 255 }
   if fish[:s] > 0
     if fish.x > 1280
       fish.x = (1280.randomize :ratio) * -1
@@ -135,6 +157,16 @@ def move_fish
     i += 1
   end
 end
+
+#def check_collisions
+#  collisions = @args_state.geometry.find_all_intersect_rect @anchors, @fish
+#  if collisions.length == 0
+#    @args_outputs.labels << { x: 640,
+#                              y: 360,
+#                              text: "Hit",
+#                              alignment_enum: 1 }
+#  end
+#end
 
 def check_anchor_input
   # if there is player input, then check for nearest available anchor
@@ -298,6 +330,9 @@ def move_anchors_and_chains_inward
                   angle_anchor_y: 1.0 }
       center_x = calc_x + (calc_w /1.9) * Math.cos((calc_a - 180) * @convert)
       center_y = calc_y + (calc_h /1.9) * Math.sin((calc_a - 180) * @convert)
+
+      #check_collisions
+
       #@waves << { x: center_x,
       #            y: center_y,
       #            w: calc_w * 0.8, # w: 2,
