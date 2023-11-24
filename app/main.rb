@@ -74,6 +74,7 @@ def tick_game_scene
   move_anchors_and_chains_inward
   swing_anchor_back_to_idle
   draw_anchors_and_chains
+  replenish_fish
   output_to_sprites
   show_framerate
 
@@ -479,6 +480,10 @@ def draw_anchors_and_chains
       end
     end
   end
+end
+
+def replenish_fish
+  @fish = @fish + [new_fish] if @fish.length < 100
 end
 
 def output_to_sprites
