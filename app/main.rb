@@ -141,6 +141,10 @@ def move_single_fish fish
   end
   # debug rough collision area
   # @args_outputs.borders << [fish.x, fish.y, fish.w, fish.h]
+  # @args_outputs.borders << [fish.x + (fish.w/2),
+  #                           fish.y + (fish.h/2),
+  #                           2,
+  #                           2]
 end
 
 def draw_fish
@@ -159,16 +163,6 @@ def move_fish
     i += 1
   end
 end
-
-#def check_collisions
-#  collisions = @args_state.geometry.find_all_intersect_rect @anchors, @fish
-#  if collisions.length == 0
-#    @args_outputs.labels << { x: 640,
-#                              y: 360,
-#                              text: "Hit",
-#                              alignment_enum: 1 }
-#  end
-#end
 
 def check_anchor_input
   # if there is player input, then check for nearest available anchor
@@ -260,19 +254,6 @@ def move_anchors_and_chains_outward
                   anchor_y: 1,
                   angle_anchor_x: 0.5,
                   angle_anchor_y: 1.0 }
-      center_x = calc_x + (calc_w /1.9) * Math.cos((calc_a - 180) * @convert)
-      center_y = calc_y + (calc_h /1.9) * Math.sin((calc_a - 180) * @convert)
-      #@waves << { x: center_x,
-      #            y: center_y,
-      #            w: calc_w * 0.8, # w: 2,
-      #            h: calc_h * 0.8, # h: 2,
-      #            path: "sprites/circle-white.png", # path: :pixel,
-      #            anchor_x: 0.5,
-      #            anchor_y: 0.5,
-      #            a: 25,
-      #            r: 255,
-      #            g: 255,
-      #            b: 255 }
       anchor.state = :endpoint if progress >= 1
     end
   end
@@ -305,7 +286,7 @@ def move_anchors_and_chains_inward
       anchor.angle = calc_a - 90
       distance = @args_geometry.distance anchor.ship, { x: calc_x, y: calc_y }
       distance = 910 if distance > 910
-      @waves << { # where to render the render target
+      @waves << {
                   x: calc_x,
                   y: calc_y,
                   w: 70,
@@ -339,20 +320,35 @@ def move_anchors_and_chains_inward
 
       anc = { x: center_x - (calc_w / 2), y: center_y - (calc_h / 2), w: calc_w, h: calc_h }
       collisions = @args_state.geometry.find_all_intersect_rect anc, @fish
+      # @fish = @fish - collisions if collisions.length != 0
       # putz "collisions: #{collisions}"
-      @fish = @fish - collisions
+      f = collisions
+      l = f.length 
+      if l != 0
+        putz "collision length: #{l}"
+        i = 0
+        while i < l
+          fp = { x: f[i][:x] + (f[i][:w]/2), y: f[i][:y] + (f[i][:h]/2)}
+          distance = @args_geometry.distance fp, { x: center_x, y: center_y }
+          if distance < ((calc_w/2) + (f[i][:w]/2)) / 1.6
+            @fish = @fish - [f[i]]
+            putz "distance: #{distance}"
+          end
+          i += 1
+        end
+      end
 
-      #@waves << { x: center_x,
-      #            y: center_y,
-      #            w: calc_w * 0.8, # w: 2,
-      #            h: calc_h * 0.8, # h: 2,
-      #            path: "sprites/circle-white.png", # path: :pixel,
-      #            anchor_x: 0.5,
-      #            anchor_y: 0.5,
-      #            a: 25,
-      #            r: 255,
-      #            g: 255,
-      #            b: 255 }
+      # @waves << { x: center_x,
+      #             y: center_y,
+      #             w: calc_w * 0.8, # w: 2,
+      #             h: calc_h * 0.8, # h: 2,
+      #             path: "sprites/circle-white.png", # path: :pixel,
+      #             anchor_x: 0.5,
+      #             anchor_y: 0.5,
+      #             a: 25,
+      #             r: 25,
+      #             g: 25,
+      #             b: 25 }
       anchor.state = :swing if progress >= 1
     end
   end
