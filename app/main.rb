@@ -325,14 +325,14 @@ def move_anchors_and_chains_inward
       f = collisions
       l = f.length 
       if l != 0
-        putz "collision length: #{l}"
+        # putz "collision length: #{l}"
         i = 0
         while i < l
           fp = { x: f[i][:x] + (f[i][:w]/2), y: f[i][:y] + (f[i][:h]/2)}
           distance = @args_geometry.distance fp, { x: center_x, y: center_y }
           if distance < ((calc_w/2) + (f[i][:w]/2)) / 1.6
             @fish = @fish - [f[i]]
-            putz "distance: #{distance}"
+            # putz "distance: #{distance}"
           end
           i += 1
         end
