@@ -1,6 +1,6 @@
 $gtk.reset
 $gtk.set_window_scale(0.75)
-$gtk.disable_console if $gtk.production?
+# $gtk.disable_console if $gtk.production?
 
 def tick args
   # using sample 02_input_basics/07_managing_scenes as an initial sort of starting point/template
@@ -139,6 +139,8 @@ def move_single_fish fish
       fish[:s] = (1 + (4.randomize :ratio)) * -1
     end
   end
+  # debug rough collision area
+  # @args_outputs.borders << [fish.x, fish.y, fish.w, fish.h]
 end
 
 def draw_fish
@@ -309,7 +311,7 @@ def move_anchors_and_chains_inward
                   w: 70,
                   h: distance,
                   path: "sprites/chains.png",
-                  angle: calc_a - 90,
+                  angle: anchor.angle,
                   anchor_x: 0.5,
                   anchor_y: 0,
                   angle_anchor_x: 0.5,
@@ -328,10 +330,17 @@ def move_anchors_and_chains_inward
                   anchor_y: 1,
                   angle_anchor_x: 0.5,
                   angle_anchor_y: 1.0 }
-      center_x = calc_x + (calc_w /1.9) * Math.cos((calc_a - 180) * @convert)
-      center_y = calc_y + (calc_h /1.9) * Math.sin((calc_a - 180) * @convert)
+      center_x = calc_x + (calc_w / 1.9) * Math.cos((calc_a - 180) * @convert)
+      center_y = calc_y + (calc_h / 1.9) * Math.sin((calc_a - 180) * @convert)
+      
+      # corner_x = center_x - (calc_w / 2)
+      # corner_y = center_y - (calc_h / 2)
+      # @args_outputs.borders << [ corner_x, corner_y, calc_w, calc_h ]
 
-      #check_collisions
+      anc = { x: center_x - (calc_w / 2), y: center_y - (calc_h / 2), w: calc_w, h: calc_h }
+      collisions = @args_state.geometry.find_all_intersect_rect anc, @fish
+      # putz "collisions: #{collisions}"
+      @fish = @fish - collisions
 
       #@waves << { x: center_x,
       #            y: center_y,
