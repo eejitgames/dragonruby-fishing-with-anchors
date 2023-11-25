@@ -347,7 +347,7 @@ def move_anchors_and_chains_inward
         while i < l
           fp = { x: f[i][:x] + (f[i][:w]/2), y: f[i][:y] + (f[i][:h]/2) }
           distance = @args_geometry.distance fp, { x: center_x, y: center_y }
-          if distance < ((calc_w/2) + (f[i][:w]/2)) / 1.8
+          if distance < ((calc_w/2) + (f[i][:w]/2)) / 1.7
             @fish = @fish - [f[i]]
             # f[i][:x] = (center_x - f[i][:x]) / 2
             # f[i][:y] = (center_y - f[i][:y]) / 2
@@ -355,8 +355,8 @@ def move_anchors_and_chains_inward
             #f[i][:y] = center_y
             #f[i][:anchor_x] = 0.5
             #f[i][:anchor_y] = 0.5
-            f[i][:ox] = (f[i][:x] - calc_x ) * 0.8
-            f[i][:oy] = (f[i][:y] - calc_y ) * 0.8
+            f[i][:ox] = (f[i][:x] - calc_x ) * 0.7
+            f[i][:oy] = (f[i][:y] - calc_y ) * 0.7
             # puts "ox: #{f[i][:ox]}"
             # puts "oy: #{f[i][:oy]}"
             # add this fish to the group of clumped fish on this anchor
