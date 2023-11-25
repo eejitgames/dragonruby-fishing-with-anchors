@@ -310,8 +310,8 @@ def move_anchors_and_chains_inward
         l = c.length
         i = 0
         while i < l
-          c[i][:x] = center_x # + c[i][:x]
-          c[i][:y] = center_y # + c[i][:y] 
+          c[i][:x] = calc_x + c[i][:ox] # + c[i][:x]
+          c[i][:y] = calc_y + c[i][:oy] # + c[i][:y] 
           i += 1
         end
         # anchor.clump = []
@@ -345,16 +345,20 @@ def move_anchors_and_chains_inward
         # putz "collision length: #{l}"
         i = 0
         while i < l
-          fp = { x: f[i][:x] + (f[i][:w]/2), y: f[i][:y] + (f[i][:h]/2)}
+          fp = { x: f[i][:x] + (f[i][:w]/2), y: f[i][:y] + (f[i][:h]/2) }
           distance = @args_geometry.distance fp, { x: center_x, y: center_y }
-          if distance < ((calc_w/2) + (f[i][:w]/2)) / 1.6
+          if distance < ((calc_w/2) + (f[i][:w]/2)) / 1.8
             @fish = @fish - [f[i]]
             # f[i][:x] = (center_x - f[i][:x]) / 2
             # f[i][:y] = (center_y - f[i][:y]) / 2
-            f[i][:x] = center_x
-            f[i][:y] = center_y
-            f[i][:anchor_x] = 0.5
-            f[i][:anchor_y] = 0.5
+            #f[i][:x] = center_x
+            #f[i][:y] = center_y
+            #f[i][:anchor_x] = 0.5
+            #f[i][:anchor_y] = 0.5
+            f[i][:ox] = (f[i][:x] - calc_x ) * 0.8
+            f[i][:oy] = (f[i][:y] - calc_y ) * 0.8
+            # puts "ox: #{f[i][:ox]}"
+            # puts "oy: #{f[i][:oy]}"
             # add this fish to the group of clumped fish on this anchor
             anchor.clump += [f[i]]
             # puts "clump len: #{anchor.clump.length}"
@@ -366,17 +370,17 @@ def move_anchors_and_chains_inward
         end
       end
 
-      # @waves << { x: center_x,
-      #             y: center_y,
-      #             w: calc_w * 0.8, # w: 2,
-      #             h: calc_h * 0.8, # h: 2,
-      #             path: "sprites/circle-white.png", # path: :pixel,
-      #             anchor_x: 0.5,
-      #             anchor_y: 0.5,
-      #             a: 25,
-      #             r: 25,
-      #             g: 25,
-      #             b: 25 }
+      #@waves << { x: center_x,
+      #            y: center_y,
+      #            w: 2, # calc_w * 0.8, # w: 2,
+      #            h: 2, # calc_h * 0.8, # h: 2,
+      #            path: :pixel, # "sprites/circle-white.png", # path: :pixel,
+      #            anchor_x: 0.5,
+      #            anchor_y: 0.5,
+      #            a: 255,
+      #            r: 255,
+      #            g: 255,
+      #            b: 255 }
       anchor.state = :swing if progress >= 1
     end
   end
@@ -564,8 +568,8 @@ def new_fish
       r: fish_color.r,
       g: fish_color.g,
       b: fish_color.b,
-      anchor_x: 0,
-      anchor_y: 0
+      ox: 0,
+      oy: 0
     }
   else
     {
@@ -581,7 +585,9 @@ def new_fish
       a: 255,
       r: fish_color.r,
       g: fish_color.g,
-      b: fish_color.b
+      b: fish_color.b,
+      ox: 0,
+      oy: 0
     }
   end
 end
