@@ -196,7 +196,7 @@ end
 
 def update_all_anchor_ship_position
   shangle = @position[@x_coor][:angle] * @convert
-  shipy = @position[@x_coor][:y]
+  shipy = @position[@x_coor][:y] + @water_level
   anchors = @anchors.map do |id, obj|
     if id == :left
       obj.ship.x = (419.5 + (458/2)) - (@radius1 * Math.sin(@dangle1 - shangle))
@@ -429,7 +429,7 @@ end
 def render_pirate_ship_fg_wave
   # hax stick ship in here for now to get it in at the correct layer
   @waves << { x: 420,
-              y: 708 - @position[@x_coor][:y],
+              y: 708 - @position[@x_coor][:y] - @water_level,
               w: 458,
               h: 322,
               path: "sprites/ship.png",
@@ -554,6 +554,7 @@ def defaults
   @wave_speed = 0.2
   @show_fps = nil
   @game_paused = nil
+  @water_level = 0 # as this gets higher, the ship gets lower in the water
   # some magic numbers worked out based on the ship sprite
   @radius1 = 164.2680736
   @radius2 = 111.3058848
