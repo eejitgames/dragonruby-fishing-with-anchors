@@ -333,6 +333,7 @@ def move_anchors_and_chains_inward
           distance = @args_geometry.distance fp, { x: center_x, y: center_y }
           if distance < ((calc_w/2) + (f[i][:w]/2)) / 1.6
             @fish = @fish - [f[i]]
+            @water_level += 0.1 if @water_level < 17
             # putz "distance: #{distance}"
           end
           i += 1
@@ -432,7 +433,15 @@ def render_pirate_ship_fg_wave
               y: 708 - @position[@x_coor][:y] - @water_level,
               w: 458,
               h: 322,
-              path: "sprites/ship.png",
+              path: "sprites/ship_1.png",
+              angle: ((@position[@x_coor][:angle])),
+              a: 255 }
+  # draw fish piling up here
+  @waves << { x: 420,
+              y: 708 - @position[@x_coor][:y] - @water_level,
+              w: 458,
+              h: 322,
+              path: "sprites/ship_0.png",
               angle: ((@position[@x_coor][:angle])),
               a: 255 }
   @waves << scrolling_background(@x_coor, "sprites/water1.png")
