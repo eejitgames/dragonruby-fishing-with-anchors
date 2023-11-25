@@ -284,6 +284,8 @@ def move_anchors_and_chains_inward
       calc_w = 140 + (70 - 140) * progress
       calc_h = 140 + (70 - 140) * progress
       calc_a = @args_geometry.angle_from anchor.ship, anchor.target
+      center_x = calc_x + (calc_w / 1.9) * Math.cos((calc_a - 180) * @convert)
+      center_y = calc_y + (calc_h / 1.9) * Math.sin((calc_a - 180) * @convert)
       anchor.angle = calc_a - 90
       distance = @args_geometry.distance anchor.ship, { x: calc_x, y: calc_y }
       distance = 910 if distance > 910
@@ -302,6 +304,20 @@ def move_anchors_and_chains_inward
                   source_y: 0,
                   source_w: 70,
                   source_h: distance, }
+      # draw the clump of fish
+      if anchor.clump.length != 0
+        c = anchor.clump 
+        l = c.length
+        i = 0
+        while i < l
+          c[i][:x] = center_x # + c[i][:x]
+          c[i][:y] = center_y # + c[i][:y] 
+          i += 1
+        end
+        # anchor.clump = []
+        @waves << anchor.clump
+      end
+
       @waves << { x: calc_x,
                   y: calc_y,
                   w: calc_w,
@@ -312,8 +328,8 @@ def move_anchors_and_chains_inward
                   anchor_y: 1,
                   angle_anchor_x: 0.5,
                   angle_anchor_y: 1.0 }
-      center_x = calc_x + (calc_w / 1.9) * Math.cos((calc_a - 180) * @convert)
-      center_y = calc_y + (calc_h / 1.9) * Math.sin((calc_a - 180) * @convert)
+      # center_x = calc_x + (calc_w / 1.9) * Math.cos((calc_a - 180) * @convert)
+      # center_y = calc_y + (calc_h / 1.9) * Math.sin((calc_a - 180) * @convert)
       
       # corner_x = center_x - (calc_w / 2)
       # corner_y = center_y - (calc_h / 2)
@@ -333,7 +349,17 @@ def move_anchors_and_chains_inward
           distance = @args_geometry.distance fp, { x: center_x, y: center_y }
           if distance < ((calc_w/2) + (f[i][:w]/2)) / 1.6
             @fish = @fish - [f[i]]
-            @water_level += 0.1 if @water_level < 17
+            # f[i][:x] = (center_x - f[i][:x]) / 2
+            # f[i][:y] = (center_y - f[i][:y]) / 2
+            f[i][:x] = center_x
+            f[i][:y] = center_y
+            f[i][:anchor_x] = 0.5
+            f[i][:anchor_y] = 0.5
+            # add this fish to the group of clumped fish on this anchor
+            anchor.clump += [f[i]]
+            # puts "clump len: #{anchor.clump.length}"
+            # can adjust this later, maybe per fish weight score
+            @water_level += 0.1 if @water_level < 16
             # putz "distance: #{distance}"
           end
           i += 1
@@ -407,7 +433,8 @@ def swing_anchor_back_to_idle
         obj.angle -=20
         obj.angle = 0 if obj.angle < 1
       end
-      obj.state = :idle if obj.angle == 0
+      obj.state = :idle if obj.angle == 0 # && obj.clump.length == 0
+      obj.clump = [] if obj.angle == 0
     end
   end
 end
@@ -536,7 +563,9 @@ def new_fish
       a: 255,
       r: fish_color.r,
       g: fish_color.g,
-      b: fish_color.b
+      b: fish_color.b,
+      anchor_x: 0,
+      anchor_y: 0
     }
   else
     {
@@ -623,7 +652,8 @@ def defaults
       },
       duration: 0,
       start: 0,
-      angle: 0
+      angle: 0,
+      clump: []
     },
     middle: {
       state: :idle,
@@ -644,7 +674,8 @@ def defaults
       },
       duration: 0,
       start: 0,
-      angle: 0
+      angle: 0,
+      clump: []
     },
     right: {
       state: :idle,
@@ -665,7 +696,8 @@ def defaults
       },
       duration: 0,
       start: 0,
-      angle: 0
+      angle: 0,
+      clump: []
     }
   }
   # techinically not everything is set yet, but it should be when the end is reached
