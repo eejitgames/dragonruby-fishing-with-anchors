@@ -523,7 +523,10 @@ def draw_anchors_and_chains
 end
 
 def replenish_fish
-  @fish = @fish + [new_fish] if @fish.length < 100
+  if @fish.length < 100
+    f = new_fish 128
+    @fish = @fish + [f]
+  end
 end
 
 def output_to_sprites
@@ -550,12 +553,12 @@ def show_framerate
   # @my_tick_count -= 1 if @show_fps # hack to test freezing the game
 end
 
-def new_fish
+def new_fish range_x
   fish_size = @fish_sizes_weighted.sample
   fish_color = @fish_colors_weighted.sample
   if rand < 0.5
     {
-      x: (1280.randomize :ratio) * -1,
+      x: (range_x.randomize :ratio) * -1,
       y: (300.randomize :ratio) - 12,
       w: fish_size.w,
       h: fish_size.h,
@@ -573,7 +576,7 @@ def new_fish
     }
   else
     {
-      x: (1280.randomize :ratio) + 1280,
+      x: (range_x.randomize :ratio) + 1280,
       y: (300.randomize :ratio) - 12,
       w: fish_size.w,
       h: fish_size.h,
@@ -637,7 +640,7 @@ def defaults
     { h: 80, w: 96 },
     { h: 96, w: 96 }
   ]
-  @fish = 100.map { |i| new_fish }
+  @fish = 100.map { |i| new_fish 1280 }
   @anchors = {
     left: {
       state: :idle,
