@@ -558,7 +558,7 @@ def new_fish range_x
   fish_color = @fish_colors_weighted.sample
   if rand < 0.5
     {
-      x: (range_x.randomize :ratio) * -1,
+      x: ((range_x.randomize :ratio) * -1) - 128,
       y: (300.randomize :ratio) - 12,
       w: fish_size.w,
       h: fish_size.h,
@@ -576,7 +576,7 @@ def new_fish range_x
     }
   else
     {
-      x: (range_x.randomize :ratio) + 1280,
+      x: (range_x.randomize :ratio) + 1280 + 128,
       y: (300.randomize :ratio) - 12,
       w: fish_size.w,
       h: fish_size.h,
