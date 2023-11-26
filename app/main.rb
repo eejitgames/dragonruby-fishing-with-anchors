@@ -363,7 +363,7 @@ def move_anchors_and_chains_inward
             anchor.clump += [f[i]]
             # puts "clump len: #{anchor.clump.length}"
             # can adjust this later, maybe per fish weight score
-            @water_level += 0.1 if @water_level < 16
+            @water_level += 0.1 if @water_level < 19
             # putz "distance: #{distance}"
           end
           i += 1
@@ -460,21 +460,26 @@ end
 
 def render_pirate_ship_fg_wave
   # hax stick ship in here for now to get it in at the correct layer
+  #@waves << { x: 420,
+  #            y: 708 - @position[@x_coor][:y] - @water_level,
+  #            w: 458,
+  #            h: 322,
+  #            path: "sprites/ship_1.png",
+  #            angle: ((@position[@x_coor][:angle])),
+  #            a: 255 }
   @waves << { x: 420,
               y: 708 - @position[@x_coor][:y] - @water_level,
               w: 458,
               h: 322,
-              path: "sprites/ship_1.png",
-              angle: ((@position[@x_coor][:angle])),
-              a: 255 }
+              path: :sail,
+              angle: ((@position[@x_coor][:angle])) }
   # draw fish piling up here
   @waves << { x: 420,
               y: 708 - @position[@x_coor][:y] - @water_level,
               w: 458,
               h: 322,
               path: "sprites/ship_0.png",
-              angle: ((@position[@x_coor][:angle])),
-              a: 255 }
+              angle: ((@position[@x_coor][:angle])) }
   @waves << scrolling_background(@x_coor, "sprites/water1.png")
 end
 
@@ -548,9 +553,19 @@ def show_framerate
   # @variables are called instance variables in ruby.
   # Which means you can access these variables in ANY METHOD inside the class.
   # (Across all methods in the class - in this case, the top most class)
-  @show_fps = !@show_fps if @args_inputs.keyboard.key_down.f # orward_slash
+  @show_fps = !@show_fps if @args_inputs.keyboard.key_down.f # forward_slash
   @args_outputs.primitives << @args_gtk.framerate_diagnostics_primitives if @show_fps
   # @my_tick_count -= 1 if @show_fps # hack to test freezing the game
+  #if @args_inputs.keyboard.key_down.c
+  #  @args_outputs[:sail].clear_before_render = false
+  #  @args_outputs[:sail].w = 458
+  #  @args_outputs[:sail].h = 322
+  #  @args_outputs[:sail].sprites << { x: 176,
+  #                                    y: 75,
+  #                                    w: 70,
+  #                                    h: 70,
+  #                                    path: "sprites/anchor.png" }
+  #end
 end
 
 def new_fish range_x
@@ -611,6 +626,16 @@ def defaults
   @dangle3 = 0.8960553846
   @convert = Math::PI / 180
   @chains = { x: 0, y: 0, w: 70, h: 910, path: "sprites/chains.png" }
+  # make a non-transient RT for the sail, and fishes as they are caught
+  @args_outputs[:sail].transient!
+  @args_outputs[:sail].clear_before_render = false
+  @args_outputs[:sail].w = 458
+  @args_outputs[:sail].h = 322
+  @args_outputs[:sail].sprites << { x: 0,
+                                    y: 0,
+                                    w: 458,
+                                    h: 322,
+                                    path: "sprites/ship_1.png" }
   # fish inspiration from 09_performance/01_sprites_as_hash sample
   @fish_colors_weighted = [
     { r: 255, g: 173, b: 173 }, # FFADAD
