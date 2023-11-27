@@ -446,7 +446,10 @@ def swing_anchor_back_to_idle
         obj.angle = 0 if obj.angle < 1
       end
       obj.state = :idle if obj.angle == 0 # && obj.clump.length == 0
-      obj.clump = [] if obj.angle == 0
+      if obj.angle == 0
+        @fish_total = @fish_total + obj.clump.length
+        obj.clump = []
+      end
     end
   end
 end
@@ -464,6 +467,7 @@ def render_background_waves
   end
 
   @args_outputs.labels << { x: 10, y: 700, text: "#{@game_timer}", size_enum: 8, r: 255, g: 255, b: 255 }
+  @args_outputs.labels << { x: 10, y: 670, text: "#{@fish_total}", size_enum: 8, r: 255, g: 255, b: 255 }
 
   @x_coor = x_coor(@scroll_point_at, @wave_speed * 2)
   @waves << scrolling_background(@x_coor, "sprites/water4.png", 182)
@@ -642,6 +646,7 @@ def defaults
   @dangle3 = 0.8960553846
   @convert = Math::PI / 180
   @game_timer = 20
+  @fish_total = 0
   @chains = { x: 0, y: 0, w: 70, h: 910, path: "sprites/chains.png" }
   # make a non-transient RT for the sail, and a pile of fishes as they are caught
   @args_outputs[:sail].transient!
