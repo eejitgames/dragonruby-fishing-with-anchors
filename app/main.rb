@@ -2,6 +2,10 @@ $gtk.reset
 $gtk.set_window_scale(0.75)
 # $gtk.disable_console if $gtk.production?
 
+def reset
+  $gtk.args.state.defaults_set = nil
+end
+
 def tick args
   # using sample 02_input_basics/07_managing_scenes as an initial sort of starting point/template
   @args_state    = args.state
@@ -91,6 +95,10 @@ def tick_game_scene
   if @args_inputs.keyboard.key_down.forward_slash # @args_inputs.mouse.button_right # mouse.click
     # for now, the top part of the screen ends the game scene
     @args_state.next_scene = :game_over_scene # if @args_inputs.mouse.click.point.y > 400
+  end
+  if @game_timer <= 0 
+    @game_timer = 0
+    @args_state.next_scene = :game_over_scene
   end
 end
 
@@ -449,6 +457,14 @@ def render_background_waves
   @waves = []
   @x_coor = x_coor(@scroll_point_at, @wave_speed)
   @waves << scrolling_background(@x_coor, "sprites/water5.png", 240)
+
+  if @my_tick_count.mod_zero?(60)
+    @game_timer -= 1
+    @game_timer = 0 if @game_timer <= 0
+  end
+
+  @args_outputs.labels << { x: 10, y: 700, text: "#{@game_timer}", size_enum: 8, r: 255, g: 255, b: 255 }
+
   @x_coor = x_coor(@scroll_point_at, @wave_speed * 2)
   @waves << scrolling_background(@x_coor, "sprites/water4.png", 182)
   @x_coor = x_coor(@scroll_point_at, @wave_speed * 4)
@@ -556,16 +572,16 @@ def show_framerate
   @show_fps = !@show_fps if @args_inputs.keyboard.key_down.f # forward_slash
   @args_outputs.primitives << @args_gtk.framerate_diagnostics_primitives if @show_fps
   # @my_tick_count -= 1 if @show_fps # hack to test freezing the game
-  #if @args_inputs.keyboard.key_down.c
-  #  @args_outputs[:sail].clear_before_render = false
-  #  @args_outputs[:sail].w = 458
-  #  @args_outputs[:sail].h = 322
-  #  @args_outputs[:sail].sprites << { x: 176,
-  #                                    y: 75,
-  #                                    w: 70,
-  #                                    h: 70,
-  #                                    path: "sprites/anchor.png" }
-  #end
+  if @args_inputs.keyboard.key_down.c
+    @args_outputs[:sail].clear_before_render = false
+    @args_outputs[:sail].w = 458
+    @args_outputs[:sail].h = 322
+    @args_outputs[:sail].sprites << { x: 176,
+                                      y: 75,
+                                      w: 70,
+                                      h: 70,
+                                      path: "sprites/anchor.png" }
+  end
 end
 
 def new_fish range_x
@@ -625,10 +641,12 @@ def defaults
   @dangle2 = 0.1533323884
   @dangle3 = 0.8960553846
   @convert = Math::PI / 180
+  @game_timer = 20
   @chains = { x: 0, y: 0, w: 70, h: 910, path: "sprites/chains.png" }
-  # make a non-transient RT for the sail, and fishes as they are caught
+  # make a non-transient RT for the sail, and a pile of fishes as they are caught
   @args_outputs[:sail].transient!
-  @args_outputs[:sail].clear_before_render = false
+  @args_outputs[:sail].clear_before_render = true
+  @args_outputs[:sail].background_color = [255, 255, 255, 0]
   @args_outputs[:sail].w = 458
   @args_outputs[:sail].h = 322
   @args_outputs[:sail].sprites << { x: 0,
@@ -665,7 +683,7 @@ def defaults
     { h: 80, w: 96 },
     { h: 96, w: 96 }
   ]
-  @fish = 100.map { |i| new_fish 1280 }
+  @fish = 100.map { |i| new_fish 1280 }                                
   @anchors = {
     left: {
       state: :idle,
