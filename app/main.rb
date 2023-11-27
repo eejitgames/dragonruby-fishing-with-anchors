@@ -447,8 +447,32 @@ def swing_anchor_back_to_idle
       end
       obj.state = :idle if obj.angle == 0 # && obj.clump.length == 0
       if obj.angle == 0
-        @fish_total = @fish_total + obj.clump.length
-        obj.clump = []
+        if obj.clump.length > 0
+          @fish_total = @fish_total + obj.clump.length
+          # inspiration from 07_advanced_rendering/12_render_target_noclear sample
+          # make a non-transient RT for the pile of fishes as they are caught
+          @args_outputs[:pile].transient!
+          @args_outputs[:pile].clear_before_render = @clear_target
+          #@args_outputs[:pile].background_color = [255, 255, 255, 255]
+          @args_outputs[:pile].w = 458
+          @args_outputs[:pile].h = 322
+          #@args_outputs[:pile].sprites << { x: 0,
+          #                                  y: 0,
+          #                                  w: 458,
+          #                                  h: 322,
+          #                                  path: :pixel } # "sprites/ship_1.png" }
+          @clear_target = false if @clear_target == true
+          c = obj.clump
+          l = c.length
+          i = 0
+          while i < l
+            c[i][:x] = (200.randomize :ratio) + 90
+            c[i][:y] = (80.randomize :ratio) + 50
+            @args_outputs[:pile].sprites << c[i]  
+            i += 1
+          end
+          obj.clump = []
+        end
       end
     end
   end
@@ -480,19 +504,21 @@ end
 
 def render_pirate_ship_fg_wave
   # hax stick ship in here for now to get it in at the correct layer
-  #@waves << { x: 420,
-  #            y: 708 - @position[@x_coor][:y] - @water_level,
-  #            w: 458,
-  #            h: 322,
-  #            path: "sprites/ship_1.png",
-  #            angle: ((@position[@x_coor][:angle])),
-  #            a: 255 }
   @waves << { x: 420,
               y: 708 - @position[@x_coor][:y] - @water_level,
               w: 458,
               h: 322,
-              path: :sail,
-              angle: ((@position[@x_coor][:angle])) }
+              path: "sprites/ship_1.png",
+              angle: ((@position[@x_coor][:angle])),
+              a: 255 }
+  if @fish_total > 0
+    @waves << { x: 420,
+                y: 708 - @position[@x_coor][:y] - @water_level,
+                w: 458,
+                h: 322,
+                path: :pile,
+                angle: ((@position[@x_coor][:angle])) }
+  end
   # draw fish piling up here
   @waves << { x: 420,
               y: 708 - @position[@x_coor][:y] - @water_level,
@@ -500,6 +526,7 @@ def render_pirate_ship_fg_wave
               h: 322,
               path: "sprites/ship_0.png",
               angle: ((@position[@x_coor][:angle])) }
+
   @waves << scrolling_background(@x_coor, "sprites/water1.png")
 end
 
@@ -576,16 +603,16 @@ def show_framerate
   @show_fps = !@show_fps if @args_inputs.keyboard.key_down.f # forward_slash
   @args_outputs.primitives << @args_gtk.framerate_diagnostics_primitives if @show_fps
   # @my_tick_count -= 1 if @show_fps # hack to test freezing the game
-  if @args_inputs.keyboard.key_down.c
-    @args_outputs[:sail].clear_before_render = false
-    @args_outputs[:sail].w = 458
-    @args_outputs[:sail].h = 322
-    @args_outputs[:sail].sprites << { x: 176,
-                                      y: 75,
-                                      w: 70,
-                                      h: 70,
-                                      path: "sprites/anchor.png" }
-  end
+  #if @args_inputs.keyboard.key_down.c
+  #  @args_outputs[:sail].clear_before_render = false
+  #  @args_outputs[:sail].w = 458
+  #  @args_outputs[:sail].h = 322
+  #  @args_outputs[:sail].sprites << { x: 176,
+  #                                    y: 75,
+  #                                    w: 70,
+  #                                    h: 70,
+  #                                    path: "sprites/anchor.png" }
+  #end
 end
 
 def new_fish range_x
@@ -647,18 +674,8 @@ def defaults
   @convert = Math::PI / 180
   @game_timer = 20
   @fish_total = 0
+  @clear_target = true
   @chains = { x: 0, y: 0, w: 70, h: 910, path: "sprites/chains.png" }
-  # make a non-transient RT for the sail, and a pile of fishes as they are caught
-  @args_outputs[:sail].transient!
-  @args_outputs[:sail].clear_before_render = true
-  @args_outputs[:sail].background_color = [255, 255, 255, 0]
-  @args_outputs[:sail].w = 458
-  @args_outputs[:sail].h = 322
-  @args_outputs[:sail].sprites << { x: 0,
-                                    y: 0,
-                                    w: 458,
-                                    h: 322,
-                                    path: "sprites/ship_1.png" }
   # fish inspiration from 09_performance/01_sprites_as_hash sample
   @fish_colors_weighted = [
     { r: 255, g: 173, b: 173 }, # FFADAD
