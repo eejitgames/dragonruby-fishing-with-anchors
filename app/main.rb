@@ -466,8 +466,10 @@ def swing_anchor_back_to_idle
           l = c.length
           i = 0
           while i < l
-            c[i][:x] = (200.randomize :ratio) + 90
-            c[i][:y] = (80.randomize :ratio) + 50
+            #c[i][:x] = (200.randomize :ratio) + 90
+            #c[i][:y] = (80.randomize :ratio) + 50
+            c[i][:x] = (160.randomize :ratio) + 90
+            c[i][:y] = (80.randomize :ratio) + 30
             @args_outputs[:pile].sprites << c[i]  
             i += 1
           end
