@@ -96,7 +96,7 @@ def tick_game_scene
     # for now, the top part of the screen ends the game scene
     @args_state.next_scene = :game_over_scene # if @args_inputs.mouse.click.point.y > 400
   end
-  if @game_timer <= 0 
+  if @game_timer <= 0 and @anchors_idle == 3
     @game_timer = 0
     @args_state.next_scene = :game_over_scene
   end
@@ -175,30 +175,32 @@ end
 
 def check_anchor_input
   # if there is player input, then check for nearest available anchor
-  if @args_inputs.mouse.click
-    mouse_x = @args_inputs.mouse.click.point.x
-    mouse_y = @args_inputs.mouse.click.point.y
-    mouse_x = mouse_x.cap_min_max(0, 1280)
-    mouse_y = mouse_y.cap_min_max(0, 720)
-    # unless mouse_y > 340 # check in the main body of the front most wave, subject to change
-      idle_anchors = @anchors.select { |_, anchor| anchor[:state] == :idle }
-      unless idle_anchors.empty?
-        distances = idle_anchors.map do |id, obj|
-          # distance = Math.sqrt((mouse_x - obj[:ship.x])**2 + (mouse_y - obj[:ship.y])**2 )
-          # two styles of accessing the information shown here
-          distance = (mouse_x - obj.ship.x)**2 + (mouse_y - obj[:ship][:y])**2
-          { id: id, distance: distance }
+  unless @game_over
+    if @args_inputs.mouse.click
+      mouse_x = @args_inputs.mouse.click.point.x
+      mouse_y = @args_inputs.mouse.click.point.y
+      mouse_x = mouse_x.cap_min_max(0, 1280)
+      mouse_y = mouse_y.cap_min_max(0, 720)
+      # unless mouse_y > 340 # check in the main body of the front most wave, subject to change
+        idle_anchors = @anchors.select { |_, anchor| anchor[:state] == :idle }
+        unless idle_anchors.empty?
+          distances = idle_anchors.map do |id, obj|
+            # distance = Math.sqrt((mouse_x - obj[:ship.x])**2 + (mouse_y - obj[:ship.y])**2 )
+            # two styles of accessing the information shown here
+            distance = (mouse_x - obj.ship.x)**2 + (mouse_y - obj[:ship][:y])**2
+            { id: id, distance: distance }
+          end
+          closest = distances.min_by { |item| item[:distance] }
+          @anchors[closest.id].state = :outward
+          @anchors[closest.id].target.x = mouse_x # assumes end size of 140
+          @anchors[closest.id].target.y = mouse_y # assumes end size of 140
+          @anchors[closest.id].duration = (Math.sqrt closest.distance ) / 7
+          @anchors[closest.id].duration = @anchors[closest.id].duration.cap_min_max(25, 55)
+          @anchors[closest.id].start = @my_tick_count
+          # putz "distance: #{@anchors[closest.id].duration}"
         end
-        closest = distances.min_by { |item| item[:distance] }
-        @anchors[closest.id].state = :outward
-        @anchors[closest.id].target.x = mouse_x # assumes end size of 140
-        @anchors[closest.id].target.y = mouse_y # assumes end size of 140
-        @anchors[closest.id].duration = (Math.sqrt closest.distance ) / 7
-        @anchors[closest.id].duration = @anchors[closest.id].duration.cap_min_max(25, 55)
-        @anchors[closest.id].start = @my_tick_count
-        # putz "distance: #{@anchors[closest.id].duration}"
-      end
-    # end
+      # end
+    end
   end
 end
 
@@ -489,7 +491,10 @@ def render_background_waves
 
   if @my_tick_count.mod_zero?(60)
     @game_timer -= 1
-    @game_timer = 0 if @game_timer <= 0
+    if @game_timer <= 0
+      @game_timer = 0 if @game_timer <= 0
+      @game_over = true
+    end
   end
 
   @args_outputs.labels << { x: 10, y: 700, text: "#{@game_timer}", size_enum: 8, r: 255, g: 255, b: 255 }
@@ -534,6 +539,7 @@ end
 
 def draw_anchors_and_chains
   idle_anchors = @anchors.select { |_, anchor| anchor[:state] == :idle }
+  @anchors_idle = idle_anchors.length
   unless idle_anchors.empty?
     anchors = idle_anchors.map do |id, obj|
       if id == :left and obj[:state] == :idle
@@ -674,6 +680,8 @@ def defaults
   @dangle2 = 0.1533323884
   @dangle3 = 0.8960553846
   @convert = Math::PI / 180
+  @anchors_idle = 3
+  @game_over = false
   @game_timer = 20
   @fish_total = 0
   @clear_target = true
