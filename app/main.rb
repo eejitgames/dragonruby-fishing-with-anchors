@@ -2,6 +2,12 @@ $gtk.reset
 $gtk.set_window_scale(0.75)
 # $gtk.disable_console if $gtk.production?
 
+def record_time method_name, time
+    time = time * 1000
+    @maxes[method_name.to_sym] = time if time > (@maxes[method_name.to_sym] || 0)
+    @averages[method_name.to_sym] = ((@averages[method_name.to_sym] || 0) * (59) + time) / 60
+end
+
 def reset
   $gtk.args.state.defaults_set = nil
 end
@@ -43,6 +49,8 @@ def tick_title_scene
   if @args_inputs.mouse.click
     @args_state.next_scene = :game_scene
     defaults if @args_state.defaults_set.nil?
+    #@averages = {}
+    #@maxes = {}
   end
 end
 
@@ -67,19 +75,58 @@ end
 
 def tick_game_scene
   bump_timer
+  #start_time = Time.now()
   render_background_waves
+  #record_time(:render_background_waves, Time.now() - start_time)
+
+  #start_time = Time.now()
   render_pirate_ship_fg_wave
+  #record_time(:render_pirate_ship_fg_wave, Time.now() - start_time)
+
+  #start_time = Time.now()
   update_all_anchor_ship_position
+  #record_time(:update_all_anchor_ship_position, Time.now() - start_time)
+
+  #start_time = Time.now()
   check_anchor_input unless @game_paused
+  #record_time(:check_anchor_input, Time.now() - start_time)
+
+  #start_time = Time.now()
   draw_fish
+  #record_time(:draw_fish, Time.now() - start_time)
+
+  #start_time = Time.now()
   move_fish
+  #record_time(:move_fish, Time.now() - start_time)
+
+  #start_time = Time.now()
   move_anchors_and_chains_outward
+  #record_time(:move_anchors_and_chains_outward, Time.now() - start_time)
+
+  #start_time = Time.now()
   check_anchors_endpoint
+  #record_time(:check_anchors_endpoint, Time.now() - start_time)
+
+  #start_time = Time.now()
   move_anchors_and_chains_inward
+  #record_time(:move_anchors_and_chains_inward, Time.now() - start_time)
+
+  #start_time = Time.now()
   swing_anchor_back_to_idle
+  #record_time(:swing_anchor_back_to_idle, Time.now() - start_time)
+
+  #start_time = Time.now()
   draw_anchors_and_chains
+  #record_time(:draw_anchors_and_chains, Time.now() - start_time)
+
+  #start_time = Time.now()
   replenish_fish
+  #record_time(:replenish_fish, Time.now() - start_time)
+
+  #start_time = Time.now()
   output_to_sprites
+  #record_time(:output_to_sprites, Time.now() - start_time)
+
   show_framerate
 
   #@args_outputs.labels << { x: 640,
@@ -99,6 +146,8 @@ def tick_game_scene
   if @game_timer <= 0 and @anchors_idle == 3
     @game_timer = 0
     @args_state.next_scene = :game_over_scene
+    #puts "averages: #{@averages}"
+    #puts "maxes: #{@maxes}"
   end
 end
 
@@ -121,8 +170,10 @@ end
 def move_single_fish fish
   # multiple sprites inspiration from 03_rendering_sprites/01_animation_using_separate_pngs sample
   fish.path = "sprites/fishGrayscale_#{fish.l.frame_index 2, 20, true, @my_tick_count}.png"
-  fish.x += fish[:s] unless @game_paused
-  fish.y = fish.y + (2 * rand + 2).*(0.25).randomize(:ratio, :sign) unless @game_paused
+  unless @game_paused
+    fish.x += fish[:s]
+    fish.y = fish.y + (2 * rand + 2).*(0.25).randomize(:ratio, :sign)
+  end
   fish.y = fish.y.cap_min_max(-12, 288)
   #@waves << { x: fish.x,
   #            y: fish.y,
@@ -137,15 +188,21 @@ def move_single_fish fish
   #            b: 255 }
   if fish[:s] > 0
     if fish.x > 1280
-      fish.x = (1280.randomize :ratio) * -1
-      fish.y = (300.randomize :ratio) - 12
-      fish[:s] = 1 + (4.randomize :ratio)
+      #fish.x = (1280.randomize :ratio) * -1
+      #fish.y = (300.randomize :ratio) - 12
+      #fish[:s] = 1 + (4.randomize :ratio)
+      fish.x = -1280 * rand
+      fish.y = 300 * rand - 12
+      fish[:s] = 4 * rand + 1
     end
   else
     if fish.x < -128
-      fish.x = (1280.randomize :ratio) + 1280
-      fish.y = (300.randomize :ratio) - 12
-      fish[:s] = (1 + (4.randomize :ratio)) * -1
+      #fish.x = (1280.randomize :ratio) + 1280
+      #fish.y = (300.randomize :ratio) - 12
+      #fish[:s] = (1 + (4.randomize :ratio)) * -1
+      fish.x = 1280 * rand + 1280
+      fish.y = 300 * rand - 12
+      fish[:s] = -4 * rand
     end
   end
   # debug rough collision area
