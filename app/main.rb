@@ -469,7 +469,7 @@ def swing_anchor_back_to_idle
           i = 0
           while i < l
             fishy = c[i].dup
-            fishy[:x] = (150.randomize :ratio) + 100
+            fishy[:x] = (185.randomize :ratio) + 70
             fishy[:y] = (80.randomize :ratio) + 30
             @args_outputs[:pile].sprites << fishy
             i += 1
