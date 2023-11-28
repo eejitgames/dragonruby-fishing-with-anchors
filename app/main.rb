@@ -644,7 +644,7 @@ def draw_anchors_and_chains
 end
 
 def replenish_fish
-  if @fish.length < 100
+  if @fish.length < @num_fish
     f = new_fish 128
     @fish = @fish + [f]
   end
@@ -745,6 +745,7 @@ def defaults
   @game_over = false
   @game_timer = 20
   @fish_total = 0
+  @num_fish = 100
   @clear_target = true
   @chains = { x: 0, y: 0, w: 70, h: 910, path: "sprites/chains.png" }
   # fish inspiration from 09_performance/01_sprites_as_hash sample
@@ -776,7 +777,7 @@ def defaults
     { h: 80, w: 96 },
     { h: 96, w: 96 }
   ]
-  @fish = 100.map { |i| new_fish 1280 }                                
+  @fish = @num_fish.map { |i| new_fish 1280 }
   @anchors = {
     left: {
       state: :idle,
