@@ -221,7 +221,12 @@ def move_fish
   # @fish.each { |f| move_single_fish f } # unless @show_fps
   # Fn.each(@fish) { |f| move_single_fish f }
   # levi performance tricks
-  a = @fish
+  # a = @fish # try taking these half at a time
+  if @my_tick_count.even?
+    a = @fish.select.with_index { |_, i| i.even? }
+  else
+    a = @fish.select.with_index { |_, i| i.odd? }
+  end
   l = a.length
   i = 0
   while i < l
