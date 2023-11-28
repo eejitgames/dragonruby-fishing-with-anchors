@@ -373,7 +373,7 @@ def move_anchors_and_chains_inward
             anchor.clump += [f[i]]
             # puts "clump len: #{anchor.clump.length}"
             # can adjust this later, maybe per fish weight score
-            @water_level += 0.1 if @water_level < 19
+            @water_level += 0.2 if @water_level < 19
             # putz "distance: #{distance}"
           end
           i += 1
@@ -468,11 +468,10 @@ def swing_anchor_back_to_idle
           l = c.length
           i = 0
           while i < l
-            #c[i][:x] = (200.randomize :ratio) + 90
-            #c[i][:y] = (80.randomize :ratio) + 50
-            c[i][:x] = (160.randomize :ratio) + 90
-            c[i][:y] = (80.randomize :ratio) + 30
-            @args_outputs[:pile].sprites << c[i]  
+            fishy = c[i].dup
+            fishy[:x] = (150.randomize :ratio) + 100
+            fishy[:y] = (80.randomize :ratio) + 30
+            @args_outputs[:pile].sprites << fishy
             i += 1
           end
           obj.clump = []
