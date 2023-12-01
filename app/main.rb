@@ -49,8 +49,9 @@ def tick_title_scene
   if @args_inputs.mouse.click
     @args_state.next_scene = :game_scene
     defaults if @args_state.defaults_set.nil?
-    #@averages = {}
-    #@maxes = {}
+    # @averages = {}
+    # @maxes = {}
+
   end
 end
 
@@ -222,11 +223,12 @@ def move_fish
   # Fn.each(@fish) { |f| move_single_fish f }
   # levi performance tricks
   # a = @fish # try taking these half at a time
-  if @my_tick_count.even?
-    a = @fish.select.with_index { |_, i| i.even? }
-  else
-    a = @fish.select.with_index { |_, i| i.odd? }
-  end
+  #if @my_tick_count.even?
+  #  a = @fish.select.with_index { |_, i| i.even? }
+  #else
+  #  a = @fish.select.with_index { |_, i| i.odd? }
+  #end
+  a = @fish
   l = a.length
   i = 0
   while i < l
