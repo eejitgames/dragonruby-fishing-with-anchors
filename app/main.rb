@@ -20,6 +20,7 @@ def tick args
   @args_easing   = args.easing
   @args_geometry = args.geometry
   @args_gtk      = args.gtk
+  @args          = args
 
   current_scene = @args_state.current_scene
 
@@ -513,6 +514,14 @@ def swing_anchor_back_to_idle
       end
       obj.state = :idle if obj.angle == 0 # && obj.clump.length == 0
       if obj.angle == 0
+        @args.audio[:bell] = {
+          input: 'sounds/bell.ogg',  # Filename
+          x: 0.0, y: 0.0, z: 0.0,        # Relative position to the listener, x, y, z from -1.0 to 1.0
+          gain: 0.2,                     # Volume (0.0 to 1.0)
+          pitch: 1.0,                    # Pitch of the sound (1.0 = original pitch)
+          paused: false,                 # Set to true to pause the sound at the current playback position
+          looping: false,                # Set to true to loop the sound/music until you stop it
+        }
         if obj.clump.length > 0
           @fish_total = @fish_total + obj.clump.length
           # inspiration from 07_advanced_rendering/12_render_target_noclear sample
