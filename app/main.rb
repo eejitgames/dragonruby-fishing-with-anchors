@@ -564,7 +564,7 @@ def render_background_waves
     end
   end
 
-  @args_outputs.labels << { x: 10, y: 700, text: "#{@game_timer}", size_enum: 8, r: 255, g: 255, b: 255 }
+  @args_outputs.labels << { x: 10, y: 700, text: "#{@game_timer}", size_enum: 8, r: 255, g: 255, b: 255 } unless @game_timer == 20
   @args_outputs.labels << { x: 10, y: 670, text: "#{@fish_total}", size_enum: 8, r: 255, g: 255, b: 255 }
 
   @x_coor = x_coor(@scroll_point_at, @wave_speed * 2)
