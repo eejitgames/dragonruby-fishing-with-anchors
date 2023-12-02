@@ -552,11 +552,15 @@ def render_background_waves
   @x_coor = x_coor(@scroll_point_at, @wave_speed)
   @waves << scrolling_background(@x_coor, "sprites/water5.png", 240)
 
-  if @my_tick_count.mod_zero?(60)
-    @game_timer -= 1
-    if @game_timer <= 0
-      @game_timer = 0 if @game_timer <= 0
-      @game_over = true
+  unless @game_paused
+    unless @fish_total < 1
+      if @my_tick_count.mod_zero?(60)
+        @game_timer -= 1
+        if @game_timer <= 0
+          @game_timer = 0 if @game_timer <= 0
+          @game_over = true
+        end
+      end
     end
   end
 
