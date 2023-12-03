@@ -42,7 +42,9 @@ def tick args
 end
 
 def tick_title_scene
-  @args_outputs.background_color = [90, 188, 216]
+  # @args_outputs.background_color = [90, 188, 216]
+  # @args_outputs.background_color = [35, 137, 218]
+  @args_outputs.background_color = [28, 163, 236]
   @args_outputs.labels << { x: 640,
                             y: 360,
                             text: "Fishing with Anchors !",
@@ -72,10 +74,26 @@ def tick_game_over_scene
                             size_enum: 10 }
   output_to_sprites
 
-  if @args_inputs.mouse.click
+  if @args_inputs.keyboard.key_down.r # reset to title screen
+    @args_state.next_scene = :title_scene 
+    @args_state.defaults_set = nil
+  end
+
+  @args_outputs.borders << @play_again_rect
+  @args_outputs.labels << { x: 117, y: 538, text: "Play again ?", size_enum: 8, r: 255, g: 255, b: 255 }
+
+  return if !@args_inputs.mouse.click
+
+  if @args_inputs.mouse.inside_rect? @play_again_rect
     @args_state.next_scene = :title_scene
     @args_state.defaults_set = nil
   end
+
+  # change this from simple click, to click play again button
+  #if @args_inputs.mouse.click
+  #  @args_state.next_scene = :title_scene
+  #  @args_state.defaults_set = nil
+  #end
 end
 
 def tick_game_scene
@@ -772,6 +790,7 @@ def defaults
   @fish_total = 0
   @num_fish = 100
   @clear_target = true
+  @play_again_rect = { x: 111, y: 481, w: 220, h: 75 }
   @chains = { x: 0, y: 0, w: 70, h: 910, path: "sprites/chains.png" }
   # fish inspiration from 09_performance/01_sprites_as_hash sample
   @fish_colors_weighted = [
