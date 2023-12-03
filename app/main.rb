@@ -567,8 +567,8 @@ def render_background_waves
     unless @fish_total < 1
       if @my_tick_count.mod_zero?(60)
         @game_timer -= 1
-        if @game_timer <= 0
-          @game_timer = 0 if @game_timer <= 0
+        if @game_timer < 0
+          @game_timer = 0
           @game_over = true
         end
       end
