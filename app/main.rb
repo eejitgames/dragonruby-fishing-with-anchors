@@ -42,6 +42,7 @@ def tick args
 end
 
 def tick_title_scene
+  @args_outputs.background_color = [90, 188, 216]
   @args_outputs.labels << { x: 640,
                             y: 360,
                             text: "Fishing with Anchors !",
@@ -143,10 +144,13 @@ def tick_game_scene
   #                          alignment_enum: 1,
   #                          vertical_alignment_enum: 1 }
 
-  if @args_inputs.keyboard.key_down.forward_slash # @args_inputs.mouse.button_right # mouse.click
-    # for now, the top part of the screen ends the game scene
-    @args_state.next_scene = :game_over_scene # if @args_inputs.mouse.click.point.y > 400
-  end
+  #if @args_inputs.keyboard.key_down.forward_slash # @args_inputs.mouse.button_right # mouse.click
+  #  # for now, the top part of the screen ends the game scene
+  #  @args_state.next_scene = :game_over_scene # if @args_inputs.mouse.click.point.y > 400
+  #end
+
+  @game_timer = 0 if @args_inputs.keyboard.key_down.e # end game early
+
   if @game_timer <= 0 and @anchors_idle == 3
     @game_timer = 0
     @args_state.next_scene = :game_over_scene
