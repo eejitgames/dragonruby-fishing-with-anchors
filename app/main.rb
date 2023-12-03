@@ -80,6 +80,7 @@ def tick_game_over_scene
   end
 
   @args_outputs.borders << @play_again_rect
+  @args_outputs.borders << { x: 111, y: 480, w: 220, h: 75 }
   @args_outputs.labels << { x: 117, y: 538, text: "Play again ?", size_enum: 8, r: 255, g: 255, b: 255 }
 
   return if !@args_inputs.mouse.click
