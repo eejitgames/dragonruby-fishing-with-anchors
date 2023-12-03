@@ -44,8 +44,9 @@ end
 def tick_title_scene
   @args_outputs.labels << { x: 640,
                             y: 360,
-                            text: "Title Scene (click to go to game)",
-                            alignment_enum: 1 }
+                            text: "Fishing with Anchors !",
+                            alignment_enum: 1,
+                            size_enum: 10 }
 
   if @args_inputs.mouse.click
     @args_state.next_scene = :game_scene
@@ -65,8 +66,9 @@ def tick_game_over_scene
   draw_anchors_and_chains
   @args_outputs.labels << { x: 640,
                             y: 360,
-                            text: "Game Over Scene (click to go to title)",
-                            alignment_enum: 1 }
+                            text: "Game Over !",
+                            alignment_enum: 1,
+                            size_enum: 10 }
   output_to_sprites
 
   if @args_inputs.mouse.click
@@ -573,8 +575,8 @@ def render_background_waves
     end
   end
 
-  @args_outputs.labels << { x: 10, y: 700, text: "#{@game_timer}", size_enum: 8, r: 255, g: 255, b: 255 } unless @game_timer == 20
-  @args_outputs.labels << { x: 10, y: 670, text: "#{@fish_total}", size_enum: 8, r: 255, g: 255, b: 255 }
+  @args_outputs.labels << { x: 10, y: 700, text: "Countdown: #{@game_timer}", size_enum: 8, r: 255, g: 255, b: 255 } unless (@game_timer < 1 or @game_timer > 20)
+  @args_outputs.labels << { x: 10, y: 670, text: "You caught #{@fish_total} fish !", size_enum: 8, r: 255, g: 255, b: 255 } unless @game_timer != 0
 
   @x_coor = x_coor(@scroll_point_at, @wave_speed * 2)
   @waves << scrolling_background(@x_coor, "sprites/water4.png", 182)
@@ -758,7 +760,7 @@ def defaults
   @convert = Math::PI / 180
   @anchors_idle = 3
   @game_over = false
-  @game_timer = 20
+  @game_timer = 21 # first show up as 20 when displays
   @fish_total = 0
   @num_fish = 100
   @clear_target = true
