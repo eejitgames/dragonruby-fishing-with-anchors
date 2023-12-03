@@ -150,6 +150,10 @@ def tick_game_scene
   #end
 
   @game_timer = 0 if @args_inputs.keyboard.key_down.e # end game early
+  if @args_inputs.keyboard.key_down.r # reset to title screen
+    @args_state.next_scene = :title_scene 
+    @args_state.defaults_set = nil
+  end
 
   if @game_timer <= 0 and @anchors_idle == 3
     @game_timer = 0
