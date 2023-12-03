@@ -46,8 +46,26 @@ def tick_title_scene
   # @args_outputs.background_color = [35, 137, 218]
   @args_outputs.background_color = [28, 163, 236]
   @args_outputs.labels << { x: 640,
-                            y: 360,
+                            y: 440,
                             text: "Fishing with Anchors !",
+                            alignment_enum: 1,
+                            size_enum: 10 }
+
+  @args_outputs.labels << { x: 640,
+                            y: 320,
+                            text: "First catch starts the 20 second timer",
+                            alignment_enum: 1,
+                            size_enum: 10 }
+
+  @args_outputs.labels << { x: 640,
+                            y: 280,
+                            text: "r - reset to title screen",
+                            alignment_enum: 1,
+                            size_enum: 10 }
+
+  @args_outputs.labels << { x: 640,
+                            y: 240,
+                            text: "e - end game early",
                             alignment_enum: 1,
                             size_enum: 10 }
 
