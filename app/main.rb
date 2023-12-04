@@ -74,7 +74,7 @@ def tick_title_scene
     defaults if @args_state.defaults_set.nil?
     # @averages = {}
     # @maxes = {}
-
+    @args.audio[:boat].paused = false
   end
 end
 
@@ -91,6 +91,8 @@ def tick_game_over_scene
                             alignment_enum: 1,
                             size_enum: 10 }
   output_to_sprites
+
+  @args.audio[:boat].paused = true
 
   if @args_inputs.keyboard.key_down.r # reset to title screen
     @args_state.next_scene = :title_scene 
@@ -562,7 +564,7 @@ def swing_anchor_back_to_idle
       obj.state = :idle if obj.angle == 0 # && obj.clump.length == 0
       if obj.angle == 0
         @args.audio[:bell] = {
-          input: 'sounds/bell.ogg',  # Filename
+          input: 'sounds/bell.ogg',      # Filename
           x: 0.0, y: 0.0, z: 0.0,        # Relative position to the listener, x, y, z from -1.0 to 1.0
           gain: 0.2,                     # Volume (0.0 to 1.0)
           pitch: 1.0,                    # Pitch of the sound (1.0 = original pitch)
@@ -811,6 +813,14 @@ def defaults
   @clear_target = true
   @play_again_rect = { x: 111, y: 481, w: 220, h: 75 }
   @chains = { x: 0, y: 0, w: 70, h: 910, path: "sprites/chains.png" }
+  @args.audio[:boat] = {
+    input: 'sounds/boat.ogg',       # Filename
+    x: 0.0, y: 0.0, z: 0.0,         # Relative position to the listener, x, y, z from -1.0 to 1.0
+    gain: 0.5,                      # Volume (0.0 to 1.0)
+    pitch: 1.0,                     # Pitch of the sound (1.0 = original pitch)
+    paused: true,                   # Set to true to pause the sound at the current playback position
+    looping: true,                  # Set to true to loop the sound/music until you stop it
+  }
   # fish inspiration from 09_performance/01_sprites_as_hash sample
   @fish_colors_weighted = [
     { r: 255, g: 173, b: 173 }, # FFADAD
