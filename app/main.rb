@@ -206,12 +206,14 @@ def bump_timer
   # add check here whether the game has focus or not
   # if not, pause music, skip increment count, etc
   if !@args_inputs.keyboard.has_focus && @args_state.tick_count != 0
+    @args.audio[:boat].paused = true
     @game_paused = true
     @args_outputs.labels << { x: 640,
                               y: 360,
                               text: "Game Paused",
                               alignment_enum: 1 }
   else
+    @args.audio[:boat].paused = false
     @scroll_point_at = @my_tick_count
     @my_tick_count += 1 # unless @show_fps
     @game_paused = nil
