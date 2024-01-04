@@ -1,12 +1,5 @@
 $gtk.reset
 $gtk.set_window_scale(0.75)
-# $gtk.disable_console if $gtk.production?
-
-def record_time method_name, time
-    time = time * 1000
-    @maxes[method_name.to_sym] = time if time > (@maxes[method_name.to_sym] || 0)
-    @averages[method_name.to_sym] = ((@averages[method_name.to_sym] || 0) * (59) + time) / 60
-end
 
 def reset
   $gtk.args.state.defaults_set = nil
@@ -42,8 +35,6 @@ def tick args
 end
 
 def tick_title_scene
-  # @args_outputs.background_color = [90, 188, 216]
-  # @args_outputs.background_color = [35, 137, 218]
   @args_outputs.background_color = [28, 163, 236]
   @args_outputs.labels << { x: 640,
                             y: 440,
@@ -72,8 +63,6 @@ def tick_title_scene
   if @args_inputs.mouse.click
     @args_state.next_scene = :game_scene
     defaults if @args_state.defaults_set.nil?
-    # @averages = {}
-    # @maxes = {}
     @args.audio[:boat].paused = false
   end
 end
@@ -93,12 +82,6 @@ def tick_game_over_scene
   output_to_sprites
 
   @args.audio[:boat].paused = true
-
-  if @args_inputs.keyboard.key_down.r # reset to title screen
-    @args_state.next_scene = :title_scene 
-    @args_state.defaults_set = nil
-  end
-
   @args_outputs.borders << @play_again_rect
   @args_outputs.borders << { x: 111, y: 480, w: 220, h: 75 }
   @args_outputs.labels << { x: 117, y: 538, text: "Play again ?", size_enum: 8, r: 255, g: 255, b: 255 }
@@ -109,84 +92,24 @@ def tick_game_over_scene
     @args_state.next_scene = :title_scene
     @args_state.defaults_set = nil
   end
-
-  # change this from simple click, to click play again button
-  #if @args_inputs.mouse.click
-  #  @args_state.next_scene = :title_scene
-  #  @args_state.defaults_set = nil
-  #end
 end
 
 def tick_game_scene
   bump_timer
-  #start_time = Time.now()
   render_background_waves
-  #record_time(:render_background_waves, Time.now() - start_time)
-
-  #start_time = Time.now()
   render_pirate_ship_fg_wave
-  #record_time(:render_pirate_ship_fg_wave, Time.now() - start_time)
-
-  #start_time = Time.now()
   update_all_anchor_ship_position
-  #record_time(:update_all_anchor_ship_position, Time.now() - start_time)
-
-  #start_time = Time.now()
   check_anchor_input unless @game_paused
-  #record_time(:check_anchor_input, Time.now() - start_time)
-
-  #start_time = Time.now()
   draw_fish
-  #record_time(:draw_fish, Time.now() - start_time)
-
-  #start_time = Time.now()
   move_fish
-  #record_time(:move_fish, Time.now() - start_time)
-
-  #start_time = Time.now()
   move_anchors_and_chains_outward
-  #record_time(:move_anchors_and_chains_outward, Time.now() - start_time)
-
-  #start_time = Time.now()
   check_anchors_endpoint
-  #record_time(:check_anchors_endpoint, Time.now() - start_time)
-
-  #start_time = Time.now()
   move_anchors_and_chains_inward
-  #record_time(:move_anchors_and_chains_inward, Time.now() - start_time)
-
-  #start_time = Time.now()
   swing_anchor_back_to_idle
-  #record_time(:swing_anchor_back_to_idle, Time.now() - start_time)
-
-  #start_time = Time.now()
   draw_anchors_and_chains
-  #record_time(:draw_anchors_and_chains, Time.now() - start_time)
-
-  #start_time = Time.now()
   replenish_fish
-  #record_time(:replenish_fish, Time.now() - start_time)
-
-  #start_time = Time.now()
   output_to_sprites
-  #record_time(:output_to_sprites, Time.now() - start_time)
-
   show_framerate
-
-  #@args_outputs.labels << { x: 640,
-  #                          y: 360,
-  #                          text: "#{@args_gtk.current_framerate_render} fps render, #{@args_gtk.current_framerate_calc} fps simulation",
-  #                          size_enum: 20,
-  #                          r: 255,
-  #                          g: 0,
-  #                          b: 0,
-  #                          alignment_enum: 1,
-  #                          vertical_alignment_enum: 1 }
-
-  #if @args_inputs.keyboard.key_down.forward_slash # @args_inputs.mouse.button_right # mouse.click
-  #  # for now, the top part of the screen ends the game scene
-  #  @args_state.next_scene = :game_over_scene # if @args_inputs.mouse.click.point.y > 400
-  #end
 
   @game_timer = 0 if @args_inputs.keyboard.key_down.e # end game early
   if @args_inputs.keyboard.key_down.r # reset to title screen
@@ -197,8 +120,6 @@ def tick_game_scene
   if @game_timer <= 0 and @anchors_idle == 3
     @game_timer = 0
     @args_state.next_scene = :game_over_scene
-    #puts "averages: #{@averages}"
-    #puts "maxes: #{@maxes}"
   end
 end
 
@@ -228,42 +149,19 @@ def move_single_fish fish
     fish.y = fish.y + (2 * rand + 2).*(0.25).randomize(:ratio, :sign)
   end
   fish.y = fish.y.cap_min_max(-12, 288)
-  #@waves << { x: fish.x,
-  #            y: fish.y,
-  #            w: fish.w * 0.8,
-  #            h: fish.h * 0.8,
-  #            path: "sprites/circle-white.png", # path: :pixel,
-  #            anchor_x: -0.1,
-  #            anchor_y: -0.1,
-  #            a: 25,
-  #            r: 255,
-  #            g: 255,
-  #            b: 255 }
   if fish[:s] > 0
     if fish.x > 1280
-      #fish.x = (1280.randomize :ratio) * -1
-      #fish.y = (300.randomize :ratio) - 12
-      #fish[:s] = 1 + (4.randomize :ratio)
       fish.x = -1280 * rand
       fish.y = 300 * rand - 12
       fish[:s] = 4 * rand + 1
     end
   else
     if fish.x < -128
-      #fish.x = (1280.randomize :ratio) + 1280
-      #fish.y = (300.randomize :ratio) - 12
-      #fish[:s] = (1 + (4.randomize :ratio)) * -1
       fish.x = 1280 * rand + 1280
       fish.y = 300 * rand - 12
       fish[:s] = -4 * rand
     end
   end
-  # debug rough collision area
-  # @args_outputs.borders << [fish.x, fish.y, fish.w, fish.h]
-  # @args_outputs.borders << [fish.x + (fish.w/2),
-  #                           fish.y + (fish.h/2),
-  #                           2,
-  #                           2]
 end
 
 def draw_fish
@@ -271,8 +169,6 @@ def draw_fish
 end
 
 def move_fish
-  # @fish.each { |f| move_single_fish f } # unless @show_fps
-  # Fn.each(@fish) { |f| move_single_fish f }
   # levi performance tricks
   # a = @fish # try taking these half at a time
   #if @my_tick_count.even?
@@ -297,25 +193,22 @@ def check_anchor_input
       mouse_y = @args_inputs.mouse.click.point.y
       mouse_x = mouse_x.cap_min_max(0, 1280)
       mouse_y = mouse_y.cap_min_max(0, 720)
-      # unless mouse_y > 340 # check in the main body of the front most wave, subject to change
-        idle_anchors = @anchors.select { |_, anchor| anchor[:state] == :idle }
-        unless idle_anchors.empty?
-          distances = idle_anchors.map do |id, obj|
-            # distance = Math.sqrt((mouse_x - obj[:ship.x])**2 + (mouse_y - obj[:ship.y])**2 )
-            # two styles of accessing the information shown here
-            distance = (mouse_x - obj.ship.x)**2 + (mouse_y - obj[:ship][:y])**2
-            { id: id, distance: distance }
-          end
-          closest = distances.min_by { |item| item[:distance] }
-          @anchors[closest.id].state = :outward
-          @anchors[closest.id].target.x = mouse_x # assumes end size of 140
-          @anchors[closest.id].target.y = mouse_y # assumes end size of 140
-          @anchors[closest.id].duration = (Math.sqrt closest.distance ) / 7
-          @anchors[closest.id].duration = @anchors[closest.id].duration.cap_min_max(25, 55)
-          @anchors[closest.id].start = @my_tick_count
-          # putz "distance: #{@anchors[closest.id].duration}"
+      idle_anchors = @anchors.select { |_, anchor| anchor[:state] == :idle }
+      unless idle_anchors.empty?
+        distances = idle_anchors.map do |id, obj|
+          # distance = Math.sqrt((mouse_x - obj[:ship.x])**2 + (mouse_y - obj[:ship.y])**2 )
+          # two styles of accessing the information shown here
+          distance = (mouse_x - obj.ship.x)**2 + (mouse_y - obj[:ship][:y])**2
+          { id: id, distance: distance }
         end
-      # end
+        closest = distances.min_by { |item| item[:distance] }
+        @anchors[closest.id].state = :outward
+        @anchors[closest.id].target.x = mouse_x # assumes end size of 140
+        @anchors[closest.id].target.y = mouse_y # assumes end size of 140
+        @anchors[closest.id].duration = (Math.sqrt closest.distance ) / 7
+        @anchors[closest.id].duration = @anchors[closest.id].duration.cap_min_max(25, 55)
+        @anchors[closest.id].start = @my_tick_count
+      end
     end
   end
 end
@@ -353,7 +246,6 @@ def move_anchors_and_chains_outward
       calc_w = 70 + (140 - 70) * progress
       calc_h = 70 + (140 - 70) * progress
       calc_a = @args_geometry.angle_from anchor.ship, anchor.target
-      # putz "angle: #{calc_a - 90}"
       distance = @args_geometry.distance anchor.ship, { x: calc_x, y: calc_y }
       distance = 910 if distance > 910
       @waves << { # where to render the render target
@@ -440,7 +332,6 @@ def move_anchors_and_chains_inward
           c[i][:y] = calc_y + c[i][:oy] # + c[i][:y] 
           i += 1
         end
-        # anchor.clump = []
         @waves << anchor.clump
       end
 
@@ -454,59 +345,28 @@ def move_anchors_and_chains_inward
                   anchor_y: 1,
                   angle_anchor_x: 0.5,
                   angle_anchor_y: 1.0 }
-      # center_x = calc_x + (calc_w / 1.9) * Math.cos((calc_a - 180) * @convert)
-      # center_y = calc_y + (calc_h / 1.9) * Math.sin((calc_a - 180) * @convert)
-      
-      # corner_x = center_x - (calc_w / 2)
-      # corner_y = center_y - (calc_h / 2)
-      # @args_outputs.borders << [ corner_x, corner_y, calc_w, calc_h ]
-
       anc = { x: center_x - (calc_w / 2), y: center_y - (calc_h / 2), w: calc_w, h: calc_h }
       collisions = @args_state.geometry.find_all_intersect_rect anc, @fish
       # @fish = @fish - collisions if collisions.length != 0
-      # putz "collisions: #{collisions}"
       f = collisions
       l = f.length 
       if l != 0
-        # putz "collision length: #{l}"
         i = 0
         while i < l
           fp = { x: f[i][:x] + (f[i][:w]/2), y: f[i][:y] + (f[i][:h]/2) }
           distance = @args_geometry.distance fp, { x: center_x, y: center_y }
           if distance < ((calc_w/2) + (f[i][:w]/2)) / 1.7
             @fish = @fish - [f[i]]
-            # f[i][:x] = (center_x - f[i][:x]) / 2
-            # f[i][:y] = (center_y - f[i][:y]) / 2
-            #f[i][:x] = center_x
-            #f[i][:y] = center_y
-            #f[i][:anchor_x] = 0.5
-            #f[i][:anchor_y] = 0.5
             f[i][:ox] = (f[i][:x] - calc_x ) * 0.7
             f[i][:oy] = (f[i][:y] - calc_y ) * 0.7
-            # puts "ox: #{f[i][:ox]}"
-            # puts "oy: #{f[i][:oy]}"
             # add this fish to the group of clumped fish on this anchor
             anchor.clump += [f[i]]
-            # puts "clump len: #{anchor.clump.length}"
             # can adjust this later, maybe per fish weight score
             @water_level += 0.2 if @water_level < 19
-            # putz "distance: #{distance}"
           end
           i += 1
         end
       end
-
-      #@waves << { x: center_x,
-      #            y: center_y,
-      #            w: 2, # calc_w * 0.8, # w: 2,
-      #            h: 2, # calc_h * 0.8, # h: 2,
-      #            path: :pixel, # "sprites/circle-white.png", # path: :pixel,
-      #            anchor_x: 0.5,
-      #            anchor_y: 0.5,
-      #            a: 255,
-      #            r: 255,
-      #            g: 255,
-      #            b: 255 }
       anchor.state = :swing if progress >= 1
     end
   end
@@ -552,7 +412,6 @@ def swing_anchor_back_to_idle
                     angle_anchor_y: 1.0,
                     angle: obj.angle }
       end
-      # putz "angle: #{obj.angle}"
       if obj.angle > 180
         obj.angle += 20
         obj.angle = 0 if obj.angle > 360
@@ -579,14 +438,8 @@ def swing_anchor_back_to_idle
           # make a non-transient RT for the pile of fishes as they are caught
           @args_outputs[:pile].transient!
           @args_outputs[:pile].clear_before_render = @clear_target
-          #@args_outputs[:pile].background_color = [255, 255, 255, 255]
           @args_outputs[:pile].w = 458
           @args_outputs[:pile].h = 322
-          #@args_outputs[:pile].sprites << { x: 0,
-          #                                  y: 0,
-          #                                  w: 458,
-          #                                  h: 322,
-          #                                  path: :pixel } # "sprites/ship_1.png" }
           @clear_target = false if @clear_target == true
           c = obj.clump
           l = c.length
@@ -737,17 +590,6 @@ def show_framerate
   # (Across all methods in the class - in this case, the top most class)
   @show_fps = !@show_fps if @args_inputs.keyboard.key_down.f # forward_slash
   @args_outputs.primitives << @args_gtk.framerate_diagnostics_primitives if @show_fps
-  # @my_tick_count -= 1 if @show_fps # hack to test freezing the game
-  #if @args_inputs.keyboard.key_down.c
-  #  @args_outputs[:sail].clear_before_render = false
-  #  @args_outputs[:sail].w = 458
-  #  @args_outputs[:sail].h = 322
-  #  @args_outputs[:sail].sprites << { x: 176,
-  #                                    y: 75,
-  #                                    w: 70,
-  #                                    h: 70,
-  #                                    path: "sprites/anchor.png" }
-  #end
 end
 
 def new_fish range_x
