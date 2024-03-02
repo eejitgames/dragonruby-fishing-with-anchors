@@ -143,7 +143,7 @@ end
 
 def move_single_fish fish
   # multiple sprites inspiration from 03_rendering_sprites/01_animation_using_separate_pngs sample
-  fish.path = "sprites/fishGrayscale_#{fish.l.frame_index 2, 20, true, @my_tick_count}.png"
+  fish.path = "sprites/fish_grayscale_#{fish.l.frame_index 2, 20, true, @my_tick_count}.png"
   unless @game_paused
     fish.x += fish[:s]
     fish.y = fish.y + (2 * rand + 2).*(0.25).randomize(:ratio, :sign)
@@ -601,7 +601,7 @@ def new_fish range_x
       y: (300.randomize :ratio) - 12,
       w: fish_size.w,
       h: fish_size.h,
-      path: "sprites/fishGrayscale_0.png",
+      path: "sprites/fish_grayscale_0.png",
       s: 1 + (4.randomize :ratio),
       l: @my_tick_count,
       c: @fish_colors_weighted.sample,
