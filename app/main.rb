@@ -1,5 +1,5 @@
 $gtk.reset
-$gtk.set_window_scale(0.75)
+# $gtk.set_window_scale(0.75)
 
 def reset
   $gtk.args.state.defaults_set = nil
@@ -424,7 +424,7 @@ def swing_anchor_back_to_idle
       end
       obj.state = :idle if obj.angle == 0 # && obj.clump.length == 0
       if obj.angle == 0
-        @args.audio[:bell] = {
+        @args.audio[rand] = {
           input: 'sounds/bell.ogg',      # Filename
           x: 0.0, y: 0.0, z: 0.0,        # Relative position to the listener, x, y, z from -1.0 to 1.0
           gain: 0.2,                     # Volume (0.0 to 1.0)
